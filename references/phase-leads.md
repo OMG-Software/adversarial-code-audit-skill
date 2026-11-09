@@ -10,22 +10,24 @@ At T0, do sections 2.2, 2.4 and 2.5 only. At T1 and above, do all sections.
 
 Run only tools that are already installed. Do not install tools. Do not let a tool fetch rules, databases or packages from the network unless the user allows it. Record each tool, its version, its command and its result count in `leads.md`, including tools that failed or were absent. The report lists them.
 
+Some analysers load the target's build or configuration, which runs target code (see [execution.md](execution.md) section 1). The Notes column marks them **T2**: run them only at the isolation level the user chose, or skip them at T1. Never run tools from inside the target (`node_modules/.bin`, `vendor/bin`, wrappers).
+
 | Language or area | Tools to try (if present) | Notes |
 |---|---|---|
-| C, C++ | compiler with `-Wall -Wextra -Wconversion -Wsign-conversion -Wshadow -Wformat=2`, `clang-tidy` (`bugprone-*`, `cert-*`, `clang-analyzer-*`, `cppcoreguidelines-*`), `cppcheck`, `scan-build` | Use the project's compile database if present (`compile_commands.json`). |
-| Rust | `cargo clippy`, `cargo geiger` (unsafe count), `cargo audit` (offline DB only), `cargo deny check --disable-fetch` | |
-| Go | `go vet`, `staticcheck`, `gosec`, `govulncheck` (needs DB) | |
-| Python | `bandit`, `pip-audit` (needs DB), `mypy` | |
-| JS/TS | `eslint` with security plugins, `tsc --noEmit`, `npm audit` (needs network) | |
-| JVM | `spotbugs` with `find-sec-bugs`, `pmd` | |
-| .NET | Roslyn analyzers through `dotnet build` (with the project's analyzer settings) | |
-| PHP | `php -l`, `phpstan`, `psalm` (taint analysis), `phpcs` with security rules | |
-| Ruby | `brakeman`, `rubocop`, `bundler-audit` (offline DB only) | |
-| Swift, Objective-C | `swiftlint`; Clang static analyser through `xcodebuild analyze` | |
+| C, C++ | compiler with `-Wall -Wextra -Wconversion -Wsign-conversion -Wshadow -Wformat=2`, `clang-tidy` (`bugprone-*`, `cert-*`, `clang-analyzer-*`, `cppcoreguidelines-*`), `cppcheck`, `scan-build` | Use the project's compile database if present (`compile_commands.json`). `scan-build` runs the build: **T2**. |
+| Rust | `cargo clippy`, `cargo geiger` (unsafe count), `cargo audit` (offline DB only), `cargo deny check --disable-fetch` | `cargo clippy` and `cargo geiger` run `build.rs` and procedural macros: **T2**. |
+| Go | `go vet`, `staticcheck`, `gosec`, `govulncheck` (needs DB) | With cgo, loading packages can run the C toolchain and `#cgo` flags: treat as **T2**. |
+| Python | `bandit`, `pip-audit` (needs DB), `mypy` | `mypy` loads plugins named in the project's config: **T2** unless run with a clean config. |
+| JS/TS | `eslint` with security plugins, `tsc --noEmit`, `npm audit` (needs network) | A JavaScript ESLint config (`eslint.config.js`, `.eslintrc.js`) is target code: **T2**, or use your own config with `--no-config-lookup`. |
+| JVM | `spotbugs` with `find-sec-bugs`, `pmd` | SpotBugs needs compiled classes; building them with Maven or Gradle is **T2**. |
+| .NET | Roslyn analyzers through `dotnet build` (with the project's analyzer settings) | `dotnet build` runs MSBuild targets, analyzers and source generators: **T2**. |
+| PHP | `php -l`, `phpstan`, `psalm` (taint analysis), `phpcs` with security rules | PHPStan and Psalm load the project's autoloader and bootstrap files: **T2**. |
+| Ruby | `brakeman`, `rubocop`, `bundler-audit` (offline DB only) | `rubocop` loads `require:` entries from `.rubocop.yml`: **T2** unless run with your own config. |
+| Swift, Objective-C | `swiftlint`; Clang static analyser through `xcodebuild analyze` | `xcodebuild` runs build phases and plugins: **T2**. |
 | Lua | `luacheck` | |
 | Shell | `shellcheck`; `PSScriptAnalyzer` for PowerShell | |
 | SQL | `sqlfluff` | Linting only. Read stored code for logic. |
-| Multi-language | `semgrep` with local rule files and `--metrics=off`; `codeql` if a database can be built offline | `semgrep --config auto` uses the network. Do not use it without permission. |
+| Multi-language | `semgrep` with local rule files and `--metrics=off`; `codeql` if a database can be built offline | `semgrep --config auto` uses the network. Do not use it without permission. Do not use rule files from the target. Building a CodeQL database for a compiled language runs the build: **T2**. |
 | Secrets | `gitleaks`, `trufflehog --no-verification` | Verification sends secrets to live services. Never verify. Never copy secret values into audit files. |
 | Dependencies | `osv-scanner` with an offline database, or the lockfile itself | Without a vulnerability database, list pinned versions of security-relevant dependencies as leads for phase 6 to mark `needs-validation`. |
 
@@ -71,7 +73,7 @@ If fuzz harnesses exist, record what each one covers. Parsers on an entry surfac
 List the weakness classes that comparable software has had. Examples: a protocol implementation had signature canonicalisation bugs; a similar web framework had a path-normalisation bypass. Sources:
 - the security considerations sections of specifications the code implements;
 - the project's own security advisories and changelog;
-- if the agent has web access and the user allows it: CVEs and advisories for comparable implementations.
+- if the agent has web access and the user allows it: CVEs and advisories for comparable implementations. Search by product, library and weakness class; never put target source, secrets or findings into a query.
 
 Without web access, you may list classes from your own knowledge. Mark each one "unverified knowledge". Never cite a CVE ID from memory as fact.
 

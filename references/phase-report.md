@@ -2,11 +2,13 @@
 
 Goal: give the code owner a report they can act on and check. Build it only from the files of this run. The report never changes a status, evidence level, severity or blocker. If the report and a finding file disagree, the finding file is right: fix the report.
 
-Start this phase only when every finding is `confirmed`, `needs-validation` or `rejected`. If a budget or context limit stopped phase 6, list each unverified finding as "unverified" and never as a vulnerability.
+Normally start this phase after every finding is verified. If a budget or context limit stops verification, issue a partial report: leave each unverified candidate `proposed`, list it as "unverified" without severity, and state the unfinished checks. Do not present it as a vulnerability.
 
 Outputs:
 - `REPORT.md` – always.
 - `findings.json` and `findings.sarif` – if the user asks, or if a script in `scripts/` can produce them.
+
+Focused mode writes a report only when requested and uses the relevant sections below. Omit full-audit ledgers and counts that were not collected. Do not invent coverage numbers.
 
 ## 7.1 Writing rules
 
@@ -24,17 +26,19 @@ Outputs:
 - Mode, profile, scope, capability tier, budget used against budget planned.
 - Domain and language files used, and the excluded ones with reasons.
 - Tools run, with versions. Tools not available, and what that means for coverage.
-- Execution: the isolation level the user chose (I0–I3), missing controls, approval mode, and how many reproductions ran at each level. If any ran at I1 or I2, say so in one plain sentence.
+- Execution: the isolation level the user chose (I0–I3), missing controls, approval mode, and how many reproductions ran at each level, completed or not. If any ran at I1 or I2, say so in one plain sentence. Never call host guards a sandbox.
+- Verification: independent sub-agents, or a separate pass by the same agent.
+- Scratch cleanup: what was removed and what was kept (execution.md section 8).
 - Earlier runs used as input.
 - One sentence if the run is partial: quick profile, scoped, budget-limited, context-limited or with deferred units.
 
 ### 2. How to read the evidence
 
-Copy this section into every report unchanged, then add the counts.
+Copy this section into every report unchanged, then add the counts. It summarises [phase-verify.md sections 6.3–6.5](phase-verify.md#63-evidence-level-and-reproduction-waiver); if the two ever differ, phase-verify is right and this text must be fixed.
 
 > Each confirmed finding has an evidence level.
 >
-> - **E3 – Reproduced.** We ran a test or harness in a sandbox and saw the effect.
+> - **E3 – Reproduced.** We ran a test or harness and saw the effect. Aborted or timed-out runs do not count.
 > - **E2 – Source-traced, tool-supported.** We traced every step in the source, and a static analysis tool or type check agrees.
 > - **E1 – Source-traced.** We traced every step in the source by reading it.
 >
@@ -42,7 +46,7 @@ Copy this section into every report unchanged, then add the counts.
 >
 > Reproductions ran at the isolation level shown with each finding: I3 full sandbox, I2 partial isolation, I1 on the host with guards. The level describes the risk taken while testing, not the strength of the evidence.
 >
-> A finding is **needs validation** when the code path is real but one fact outside the repository decides it. These have no severity.
+> A finding is **needs validation** when the code path is real but one or more named facts outside the repository decide it. These have no severity.
 
 Counts: confirmed findings by evidence level.
 
@@ -99,7 +103,7 @@ The important controls that hunters attacked and found sound, with the checks do
 - Deferred and out-of-scope units, grouped by reason.
 - Attacker goals not examined.
 - The final critique result.
-- This sentence, unchanged: "This audit does not show that the code has no other vulnerabilities. Repeated and deeper runs find more."
+- This sentence, unchanged: "This audit does not show that the code has no other vulnerabilities. Further or deeper runs may find more."
 
 ### 10. Rejected candidates
 
@@ -108,7 +112,7 @@ Count only, plus the fingerprints, unless a rejection explains a coverage decisi
 ## 7.3 Consistency check
 
 Before you finish, check:
-1. Every finding file appears in exactly one report section that matches its status.
+1. Every finding file has exactly one primary detail or disposition entry matching its status, including an unverified entry for `proposed`. Summary and chain cross-references do not count as duplicate entries.
 2. Severities, evidence levels and waivers in the report match the finding files word for word.
 3. Counts in sections 2, 3 and 9 match the files.
 4. No `needs-validation` or unverified finding has a severity in the report.

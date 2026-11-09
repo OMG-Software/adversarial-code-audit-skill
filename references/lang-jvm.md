@@ -115,7 +115,7 @@ Run only tools that are installed. This section agrees with `phase-leads.md` sec
 | Tool | Offline-safe command | Notes |
 |---|---|---|
 | spotbugs + find-sec-bugs | `spotbugs -textui -pluginList <findsecbugs-plugin.jar> -effort:max -low -html <classes-dir> > out.html` | Works on compiled classes. Build with `mvn -o -q compile` or `./gradlew --offline compileJava`. The Maven plugin form needs the plugin in the local repository. |
-| Maven or Gradle | `mvn -o dependency:tree`, `./gradlew --offline dependencies` | Lists pinned versions. A wrapper may try to download its distribution. Check `distributionUrl` first. |
+| Maven or Gradle | `mvn -o dependency:tree`, `./gradlew --offline dependencies` | Build scripts, plugins and wrappers are target code: see `execution.md`. Lists pinned versions. A wrapper may try to download its distribution. Check `distributionUrl` first. |
 | PMD | `pmd check -d src -R category/java/security.xml -f text` | PMD 7 syntax. PMD 6 uses `pmd -d`. |
 | Semgrep | `semgrep --config ./local-rules --metrics=off src` | Never `--config auto`. |
 | detekt (Kotlin) | `detekt --input src` | Rule sets vary. Use as lead source. |

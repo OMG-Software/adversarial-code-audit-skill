@@ -101,7 +101,7 @@ Run only tools that are installed. This section agrees with `phase-leads.md` sec
 
 | Tool | Offline-safe command | Notes |
 |---|---|---|
-| Roslyn analyzers (built in) | `dotnet build --no-restore -p:AnalysisMode=All -p:EnableNETAnalyzers=true -v:minimal` | Needs packages in the local cache. `AnalysisMode=All` is noisy; group by rule. Security rules: CA2300 to CA2362 (deserialisers), CA3001 (SQL), CA3006 (process), CA3075 (DTD), CA5350 and CA5351 (weak crypto), CA5359 (certificate validation off). The taint rules CA3001 to CA3012 are off by default. Enable them in `.editorconfig`. |
+| Roslyn analyzers (built in) | `dotnet build --no-restore -p:AnalysisMode=All -p:EnableNETAnalyzers=true -v:minimal` | Runs MSBuild targets, analyzers and source generators from the project: target code, see `execution.md`. Needs packages in the local cache. `AnalysisMode=All` is noisy; group by rule. Security rules: CA2300 to CA2362 (deserialisers), CA3001 (SQL), CA3006 (process), CA3075 (DTD), CA5350 and CA5351 (weak crypto), CA5359 (certificate validation off). The taint rules CA3001 to CA3012 are off by default. Enable them in `.editorconfig`. |
 | `dotnet format` | `dotnet format analyzers --verify-no-changes --no-restore` | Reports; does not need to write. |
 | Security Code Scan | Analyzer package, if already in the lockfile | Third-party. Do not install. |
 | Semgrep | `semgrep --config ./local-rules --metrics=off src` | Never `--config auto`. |

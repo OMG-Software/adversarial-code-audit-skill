@@ -170,7 +170,7 @@ Adapt the patterns to the language. The language file adds framework registratio
   - Does a middleware check (CSRF, auth, schema) run for every method and type?
   - Does a method override reach a more privileged handler?
 - **Sad-path inputs:** the same body as JSON, form and multipart; a duplicate parameter with two values; an unexpected method; a `GET` with a body; a wrong `Content-Type` with a valid body.
-- **Evidence for confirmed:** the two interpretations of one request, the check that sees only one, and the effect. E1 is enough when both parsers are in the repository. E3 is needed when a framework or proxy parser outside the repository decides.
+- **Evidence for confirmed:** the two interpretations of one request, the check that sees only one, and the effect. A parser-differential claim needs E3, even when both parsers are in the repository. Without sufficient runtime evidence, retain `needs-validation`.
 - **Not a finding:** a parser that rejects every type but one; a merge order that the framework documents and the handler handles.
 - **CWE:** CWE-351 (insufficient type distinction); CWE-436 (class-level; interpretation conflict).
 

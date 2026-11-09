@@ -111,7 +111,7 @@ For each route, find the middleware chain (`Use(`, `Group(`, `With(`, intercepto
 
 ## Tools
 
-Run only what is installed. `go build`, `go vet` and `go test` can compile and run cgo code and, for tests, run `init()` and test code. Treat them as target code and follow `execution.md`. This list agrees with `phase-leads.md` section 2.1.
+Run only what is installed. `go build`, `go vet` and `go test` can compile and run cgo code and, for tests, run `init()` and test code. Treat them as target code and follow `execution.md`. `staticcheck` and `gosec` load packages the same way; without cgo they only read source. This list agrees with `phase-leads.md` section 2.1.
 
 - **go vet.** `GOFLAGS=-mod=vendor GOPROXY=off go vet ./...` (without a vendor directory, use `GOFLAGS=-mod=mod GOPROXY=off` with a populated module cache).
 - **staticcheck.** `staticcheck ./...`

@@ -1,0 +1,5 @@
+# Keep skill files LF on every platform.
+* text=auto eol=lf
+
+# Evaluation fixtures are compared by SHA-256: never convert their bytes.
+evaluations/** -text

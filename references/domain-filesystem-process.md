@@ -210,7 +210,7 @@ This domain often **needs**:
 - **E3 is required** for: every file TOCTOU claim (FP-04), as SKILL.md section 6 says; link and junction claims whose result depends on OS or file system behaviour (FP-03); signal races (FP-09); Windows search-order and path-feature claims (FP-08, FP-10). Without T2, these are `needs-validation` with a reproduction plan.
 - **Privilege gain:** a finding needs a real gain. The attacker must be less privileged than the code that acts. The same user acting on their own files is design authority.
 - **Reachability:** confirm the code runs with the claimed privilege in the default install. Confirm the lower-trust actor can write the directory (check the installer, the packaging and the default umask).
-- **E3 test shape:** run in a sandbox (I1 or above, see execution.md). Use a scratch directory, a dummy second user if available, and marker files. Force the race with a barrier. Record the observed change to the marker. Do not run privileged code on a host that you do not own.
+- **E3 test shape:** run at the isolation level the user chose (see execution.md). Use a scratch directory, a dummy second user if available, and marker files. Force the race with a barrier. Record the observed change to the marker. Do not run privileged code on a host that you do not own.
 - **Severity examples:**
   - critical – a local or remote low-privilege actor makes a root or system service write a chosen file into an executable or configuration location (FP-03, FP-05);
   - high – local privilege escalation through a setuid program or search path (FP-06, FP-08); another user's secrets readable through a wide mode (FP-01);

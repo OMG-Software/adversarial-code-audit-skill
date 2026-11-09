@@ -108,7 +108,7 @@
 
 ## Tools
 
-Use only installed tools. Do not install. `phase-leads.md` section 2.1 has no PHP row; the tools below are extra and used if present. Record each one as section 2.1 requires.
+Use only installed tools. Do not install. `phase-leads.md` section 2.1 has no PHP row; the tools below are extra and used if present. Record each one as section 2.1 requires. Binaries in the target's `vendor/bin` are target code, and PHPStan and Psalm load the project's autoloader and bootstrap files: run them only at the isolation level the user chose ([execution.md](execution.md) section 1). `php -l` and an installed `phpcs` with your own standard are T1.
 
 | Tool | Command | Notes |
 |---|---|---|

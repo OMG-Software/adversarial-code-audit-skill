@@ -217,13 +217,13 @@ This domain often **needs**:
   - For Rust unsafe code, use `cargo miri test`. For Go code that uses `unsafe`, use `go test -race` and `-gcflags=all=-d=checkptr`. For JNI, use `-Xcheck:jni`.
   - A fuzz target (libFuzzer, AFL++ or honggfuzz) can find an input. Give it a time limit, a memory limit and a corpus from the repository. Minimise the crash input, then rerun it under the sanitizer. Fuzzing is target-code execution: follow `execution.md`.
   - Static analysers (the Clang static analyzer, `cppcheck`, CodeQL) support a claim at E2. They do not replace the run.
-- **Minimum effect.** The sanitizer report proves the defect: access type, size, location and stacks. Stop there. Do not read what the memory holds, do not shape what lands in freed memory, and do not claim code execution. A crash is not code execution. A report is not proof of exploitability.
+- **Minimum effect.** The sanitizer report proves the defect: access type, size, location and stacks. Stop there. Do not read what the memory holds, do not shape what lands in freed memory, and do not claim code execution. A crash is not code execution. A report is not proof of exploitability. Severity follows the supported effect and conditions; do not infer critical impact from a remote out-of-bounds write or use after free alone.
 - **Reachability.** Show that the real entry passes attacker bytes to the function, and that callers do not cap the length first. Show that the harness input is valid at the real entry. Confirm the code is compiled in the default build.
 - **False-positive checks.** A cap or framing check in an earlier layer; a build that wraps or traps on overflow by design; instrumentation mismatch (partly instrumented containers or custom allocators can give false reports); test-only code; a debug-only assertion where release is safe.
 - **Hardening is not a verdict.** Stack protectors, address randomisation and similar flags change likelihood. A defect with these flags on stays a defect.
 - **Severity examples:**
-  - critical – an unauthenticated remote out-of-bounds write or use after free in a network-facing parser of a daemon;
-  - high – an out-of-bounds read that returns other users' data to a remote low-trust client; a repeatable remote crash of a shared service by a low-trust actor; memory corruption reachable by an authenticated user;
+  - critical – only when the evidence shows a critical impact from phase-verify.md section 6.5. A sanitizer report of an out-of-bounds write or use after free does not show this by itself;
+  - high – an unauthenticated remote out-of-bounds write or use after free in a network-facing parser of a daemon; an out-of-bounds read that returns other users' data to a remote low-trust client; a repeatable remote crash of a shared service by a low-trust actor; memory corruption reachable by an authenticated user;
   - medium – a read of a few bytes with a narrow precondition; a crash that needs a malicious local file opened by the victim;
   - low – an uninitialised read of non-sensitive padding; a null dereference in a single-user tool;
   - informational – undefined behaviour with no observed effect on supported compilers.

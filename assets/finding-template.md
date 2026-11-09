@@ -1,6 +1,6 @@
 <!--
 Finding template. Copy this file to findings/F-<fingerprint>.md and fill every field.
-Keep the headings and field names exactly as written: scripts and other agents parse them.
+Keep the headings and field names stable so reports and other agents can compare them.
 Write "none" for an empty field. Do not delete a field.
 Repository paths are relative to the target root. Never paste secret values.
 -->
@@ -14,10 +14,10 @@ Repository paths are relative to the target root. Never paste secret values.
 - evidence-level: E1 | E2 | E3
 - domain: <primary domain file name, for example authz>
 - cwe: <CWE-ID or "none">
-- coverage-units: <IDs from coverage.md>
+- coverage-units: <IDs from coverage.md, or the scoped threat model in Focused mode>
 - found-by: <agent or pass ID>
 - verified-by: <agent or pass ID, or "none">
-- source-ref: <commit hash, plus "dirty" if the worktree had changes>
+- source-ref: <commit hash and dirty-file hashes or snapshot identity from plan.md>
 
 Fingerprint rules: lowercase letters, digits, hyphens and dots only. Derive it from the root cause and the component.
 Do not include line numbers, dates, agent IDs, severity or status. Use the same fingerprint for the same root cause in every run.
@@ -25,6 +25,10 @@ Do not include line numbers, dates, agent IDs, severity or status. Use the same 
 ## Summary
 
 <Two or three sentences: who can do what to whom, through which interface, because which control fails.>
+
+## Regression origin
+
+For diff reviews: <immutable base and head identities; before/after behavior and citations; changed code that introduces or exposes the boundary failure>. Otherwise write "none".
 
 ## Attacker
 
@@ -61,7 +65,8 @@ List every precondition. Mark each as source-visible or external.
 
 - read: <files and line ranges you read for each path step>
 - tools: <commands, analyser rules or queries, and their result, or "none">
-- reproduction: <for E3: isolation level (I1, I2 or I3), limits, exact input, exact command, observed output. Otherwise "none">
+- reproduction: <for E3: isolation level (I1, I2 or I3), limits, exact input, exact command, observed output and exit status of a completed run. Otherwise "none">
+- proof test: <the test source, or a precise description, with the invariant it asserts and whether it ran. If none can be written, say what input is missing>
 
 ## Reproduction waiver
 
@@ -70,14 +75,14 @@ The report prints this section unchanged, so write it for the code owner.
 
 - deterministic steps: <for each path step, why the source alone fixes the behaviour: no branch on runtime data the attacker cannot control, no reliance on timing, memory layout, compiler output or code outside the repository>
 - runtime dependencies checked: <framework, library or platform behaviour the path relies on, and where you confirmed it (vendored source, pinned version docs, type signatures)>
-- what reproduction would add: <for example "confirms deployment config enables the route"; or "nothing: the check is absent on every path">
+- what reproduction would add: <for example "confirms the deterministic wrong-tenant response in a local test"; an unresolved deployment condition belongs in Blocker and prevents this waiver>
 - recommended confirmation: <the smallest test the owner can run to see the effect>
 
 ## Disprove attempts
 
 Filled by the verifier. Each attempt: the hypothesis that would make this a false positive, what you checked, and the result.
 
-1. <hypothesis> – <what was checked> – <holds | refuted>
+1. <hypothesis> – <what was checked and evidence> – <finding-disproved | finding-not-disproved | unresolved>
 
 ## Severity
 

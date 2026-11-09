@@ -90,7 +90,7 @@ Adapt to the framework. Language files add loader and SDK names.
   - Are tools that change state, send messages, spend money or run code reachable from sessions that process untrusted content?
 - **Sad-path inputs:** a path outside the allowed root; a URL to an internal host; a recipient chosen by the content; a very large amount; a tool name not in the list; nested arguments.
 - **Evidence for confirmed:** the tool body, the missing gate or the wide credential, the untrusted path to the context (AL-01), and the effect on a named victim or resource.
-- **Not a finding:** a tool that acts only on the requester's own data with the requester's rights; a powerful tool that only operators reach, by documented design.
+- **Not a finding:** a tool that stays within the requester's rights and authorized task, with no attacker-controlled third-party text steering the action; a powerful tool that only operators reach, by documented design. Acting on the requester's own data does not establish consent.
 - **CWE:** CWE-250 where the tool runs with excess rights; CWE-78 where a tool builds a shell command from model arguments. The missing gate and the confused-deputy shape: name in words ("tool call executes with authority of the service, not of the requester").
 
 ### AL-03 Confirmation and approval binding
@@ -117,7 +117,7 @@ Adapt to the framework. Language files add loader and SDK names.
   - Does any decision (authorization, routing) depend on what the model says?
 - **Sad-path inputs:** output with markup, a link with data in the query, a command, a traversal path, a role name, an extra field.
 - **Evidence for confirmed:** the sink, the missing validation, and an attacker-influenced context (AL-01) that reaches the model. Link the sink-side finding from the injection or web-client file.
-- **Not a finding:** model output shown as plain text to the requester only; output checked by a strict schema.
+- **Not a finding:** model output shown as plain text to the requester only; output checked for structure, permitted values, requester authority and downstream sink rules. A strict schema alone does not make a string, path, URL or command safe.
 - **CWE:** CWE-78 for output run in a shell; CWE-200 (class-level) for data that leaves through rendered links. Other sinks: use the sink's own domain file.
 
 ### AL-05 Context bleed between users and sessions

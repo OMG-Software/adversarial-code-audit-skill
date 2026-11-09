@@ -24,7 +24,7 @@ Do every check. Record the result of each, also when it finds nothing.
 6. **Variants.** Every finding lists a variant search. Every variant in another unit exists as a lead on that unit.
 7. **Lifecycle.** Units exist for start-up and default configuration, upgrade and migration, error and recovery paths, shutdown and cleanup, where the code has them.
 8. **Unread code (T1+).** Compare the union of all "paths read" with the list of in-scope files. Rank unread files by: reachable from an entry surface, size, churn, security words in the file. Add units for the top unread files that are reachable.
-9. **Blocked units.** For each `blocked` unit, decide if a different approach (another tier, another starting point, a smaller split) can finish it. If yes, reopen it with that approach in Notes.
+9. **Blocked units.** For each `blocked` unit, decide if another permitted approach can finish it. Use another starting point or smaller split without expanding scope. A different execution option requires the user's selection under execution.md; do not bypass a safety limit to improve coverage. Reopen feasible units with that approach in Notes.
 10. **History.** Each variant seed from phase 2.3 has been checked.
 
 ## 4.2 Loop and stop

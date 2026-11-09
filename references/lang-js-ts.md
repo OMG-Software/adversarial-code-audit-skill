@@ -120,12 +120,12 @@
 
 ## Tools
 
-Use only installed tools. Run from the project's own `node_modules/.bin` or use `npx --no-install`, so that nothing downloads. Do not run `npm install`.
+Use only installed tools. Do not run `npm install`. Binaries in the target's `node_modules/.bin` and JavaScript config files (`eslint.config.js`, `.eslintrc.js`) are target code: at T1, use an ESLint or `tsc` installed outside the target with your own config (`--no-config-lookup`); otherwise run them only at the isolation level the user chose ([execution.md](execution.md) section 1).
 
 | Tool | Command | Notes |
 |---|---|---|
-| `eslint` | `./node_modules/.bin/eslint SRC` | Plugins: `eslint-plugin-security`, `eslint-plugin-no-unsanitized`. The config must already be in the repository. Many false hits. |
-| `tsc` | `./node_modules/.bin/tsc --noEmit` | Finds type errors. Not a security tool. |
+| `eslint` | `eslint --no-config-lookup -c OWN_CONFIG SRC` | Plugins: `eslint-plugin-security`, `eslint-plugin-no-unsanitized`. Running the project's own ESLint or config is T2. Many false hits. |
+| `tsc` | `tsc --noEmit -p tsconfig.json` | Finds type errors. Not a security tool. Use an installed `tsc`, not the target's copy. |
 | `semgrep` | `semgrep --config LOCAL_RULES_DIR --metrics=off --disable-version-check SRC` | Local rules only. Never `--config auto`. |
 | `npm audit` | Needs the registry. | Do not run without permission. Read `package-lock.json` and list security-relevant versions as leads. |
 | Test runners | `node --test FILE`, `vitest run FILE`, `jest --ci FILE` | Run target code. See `execution.md`. |
