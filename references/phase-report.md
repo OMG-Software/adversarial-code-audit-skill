@@ -1,0 +1,131 @@
+# Phase 7 – Report
+
+Goal: give the code owner a report they can act on and check. Build it only from the files of this run. The report never changes a status, evidence level, severity or blocker. If the report and a finding file disagree, the finding file is right: fix the report.
+
+Start this phase only when every finding is `confirmed`, `needs-validation` or `rejected`. If a budget or context limit stopped phase 6, list each unverified finding as "unverified" and never as a vulnerability.
+
+Outputs:
+- `REPORT.md` – always.
+- `findings.json` and `findings.sarif` – if the user asks, or if a script in `scripts/` can produce them.
+
+## 7.1 Writing rules
+
+- Write for an engineer who owns the code and did not see the audit.
+- Use repository-relative paths and line numbers.
+- Give inputs as test inputs for a local test, not as attacks against a deployment.
+- No secret values. No weaponised exploits. No steps beyond the minimum effect.
+- State uncertainty where it exists. Do not round `needs-validation` up to a vulnerability or down to nothing.
+
+## 7.2 `REPORT.md` layout
+
+### 1. Scope and method
+
+- Target, commit, dirty state, and the date of the run.
+- Mode, profile, scope, capability tier, budget used against budget planned.
+- Domain and language files used, and the excluded ones with reasons.
+- Tools run, with versions. Tools not available, and what that means for coverage.
+- Execution: the isolation level the user chose (I0–I3), missing controls, approval mode, and how many reproductions ran at each level. If any ran at I1 or I2, say so in one plain sentence.
+- Earlier runs used as input.
+- One sentence if the run is partial: quick profile, scoped, budget-limited, context-limited or with deferred units.
+
+### 2. How to read the evidence
+
+Copy this section into every report unchanged, then add the counts.
+
+> Each confirmed finding has an evidence level.
+>
+> - **E3 – Reproduced.** We ran a test or harness in a sandbox and saw the effect.
+> - **E2 – Source-traced, tool-supported.** We traced every step in the source, and a static analysis tool or type check agrees.
+> - **E1 – Source-traced.** We traced every step in the source by reading it.
+>
+> We confirm an E1 or E2 finding only when the source alone decides every step of the attack: no step depends on timing, memory layout, compiler behaviour, or configuration outside the repository. Each such finding has a **reproduction waiver** that says why the source is enough, what a reproduction would add, and the smallest test that would show the effect. Memory-safety, race-condition and parser-differential findings always need E3. Without it, they are listed under "Needs validation".
+>
+> Reproductions ran at the isolation level shown with each finding: I3 full sandbox, I2 partial isolation, I1 on the host with guards. The level describes the risk taken while testing, not the strength of the evidence.
+>
+> A finding is **needs validation** when the code path is real but one fact outside the repository decides it. These have no severity.
+
+Counts: confirmed findings by evidence level.
+
+### 3. Summary
+
+- Two to four sentences on the security posture: where the code is strong, where it is weak, the most important finding.
+- Table of confirmed findings, sorted by overall severity, then confidence:
+
+```markdown
+| ID | Severity | Title | Boundary | Evidence | Confidence |
+|----|----------|-------|----------|----------|------------|
+```
+
+### 4. Confirmed findings
+
+For each, in table order:
+- Title, fingerprint, CWE, overall severity, likelihood and impact with reasons.
+- Summary: who can do what to whom.
+- Attacker and conditions.
+- Path, as an ordered list of file:line steps.
+- Failing control, and the other controls checked.
+- Impact, and the stronger effects **not** claimed.
+- Evidence: what was read, which tools agreed, and the reproduction (E3) or the **reproduction waiver** (E1, E2), printed in full.
+- Fix: invariant, change, regression test, variants.
+- Chains this finding is part of.
+
+### 5. Chains
+
+For each chain: the attacker goal, the steps across component findings, the end-to-end impact, and the cheapest link to break.
+
+### 6. Needs validation
+
+Table, then details. No severity.
+
+```markdown
+| ID | Title | Boundary | Missing fact | Safe check |
+|----|-------|----------|--------------|------------|
+```
+
+For each: path, why it matters if the fact is true, and the safe check. A safe check is a local test or an observation the owner makes on their own system. It is never a probe of a live deployment by the auditor.
+
+### 7. Hardening notes
+
+Weaknesses that another layer blocks today. For each: location, the layer that blocks it (file:line), and why fixing it still helps.
+
+### 8. Controls that held
+
+The important controls that hunters attacked and found sound, with the checks done. This tells the owner what not to break, and what the audit actually tested.
+
+### 9. Coverage
+
+- Units by status, from `coverage.md`.
+- The coverage numbers from phase 4.4.
+- Deferred and out-of-scope units, grouped by reason.
+- Attacker goals not examined.
+- The final critique result.
+- This sentence, unchanged: "This audit does not show that the code has no other vulnerabilities. Repeated and deeper runs find more."
+
+### 10. Rejected candidates
+
+Count only, plus the fingerprints, unless a rejection explains a coverage decision.
+
+## 7.3 Consistency check
+
+Before you finish, check:
+1. Every finding file appears in exactly one report section that matches its status.
+2. Severities, evidence levels and waivers in the report match the finding files word for word.
+3. Counts in sections 2, 3 and 9 match the files.
+4. No `needs-validation` or unverified finding has a severity in the report.
+5. No secret value appears anywhere in the output directory.
+
+Write the result of the check at the end of `REPORT.md` as one line: "Consistency check: passed" or the list of problems fixed.
+
+## 7.4 Machine-readable output
+
+**`findings.json`** – one object per finding file. Field names are the template's field names in lowercase with hyphens. Include all statuses. Keep the path as an ordered list of `{kind, file, line, scope, description}`.
+
+**`findings.sarif`** (SARIF 2.1.0) – for code-scanning tools:
+- one `run`, tool name `adversarial-code-audit`, with the skill version;
+- one rule per fingerprint; rule `properties.tags` include the CWE and domain;
+- one `result` per `confirmed` finding: `level` is `error` for critical and high, `warning` for medium, `note` for low and informational;
+- `needs-validation` findings as results with `level: note` and `properties.status: "needs-validation"`, so tools do not show them as confirmed;
+- `locations` is the sink; `codeFlows` holds the full path;
+- `properties` hold evidence level, confidence and severity fields.
+
+Do not include `rejected` findings in SARIF.
