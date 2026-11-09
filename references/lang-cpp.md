@@ -112,11 +112,11 @@ Check the build files (CMake, Meson, Bazel, MSBuild, Makefiles) for these. Missi
 
 ## Tools
 
-Use the project's compile database: generate it with `cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON` if the build allows, without fetching dependencies.
+Use the project's compile database if one exists. Generating it with `cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON` runs the project's CMake code (and can fetch dependencies through `FetchContent`), so it is target execution: follow `execution.md`.
 
 - `clang-tidy -p build --checks='bugprone-*,cert-*,clang-analyzer-*,cppcoreguidelines-*,performance-*' <files>`
 - `cppcheck --project=build/compile_commands.json --enable=warning,portability --inline-suppr`
-- `scan-build cmake --build build` (Clang static analyser)
+- `scan-build cmake --build build` (Clang static analyser; runs the build, so T2)
 - `semgrep --metrics=off --config <local rules>` with local C++ rules only
 - CodeQL C++ queries, only if a database can be built offline
 - Sanitizers (T2 only): `-fsanitize=address,undefined` with `-fno-sanitize-recover=all`; `-fsanitize=thread` for races; `-fsanitize=memory` (Clang, Linux) for uninitialised reads, which needs all code instrumented

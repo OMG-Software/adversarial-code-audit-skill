@@ -65,7 +65,7 @@ Search the registration forms, then follow the callback to the first use of the 
 
 - **Signed overflow is undefined behaviour.** The compiler may remove checks that depend on it.
   - Wrong: `if (a + b < a) return -1;` (for `int a, b`)
-  - Right: `if (b > 0 && a > INT_MAX - b) return -1;`, or `__builtin_add_overflow(a, b, &r)`.
+  - Right: `if ((b > 0 && a > INT_MAX - b) || (b < 0 && a < INT_MIN - b)) return -1;`, then add. Or use `__builtin_add_overflow(a, b, &r)` or C23 `ckd_add` and handle overflow.
 - **Unsigned arithmetic wraps without warning.** A wrapped value passes a size check.
   - Wrong: `if (off + len <= total) memcpy(dst, src + off, len);`
   - Right: `if (len <= total && off <= total - len) memcpy(dst, src + off, len);`

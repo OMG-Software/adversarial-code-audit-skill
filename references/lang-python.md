@@ -111,7 +111,7 @@ Find every place where attacker data enters. Then give each one a coverage unit.
 
 ## Build and runtime settings
 
-- **Django.** `DEBUG = True`; literal or short `SECRET_KEY`; `ALLOWED_HOSTS = ["*"]`; `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `SECURE_SSL_REDIRECT`, `SECURE_HSTS_SECONDS` (default 0); `CSRF_TRUSTED_ORIGINS`; `SECURE_PROXY_SSL_HEADER` and `USE_X_FORWARDED_HOST` (trust of proxy headers); `AUTH_PASSWORD_VALIDATORS` (default empty); `PASSWORD_HASHERS`; `DATA_UPLOAD_MAX_MEMORY_SIZE`; `DATA_UPLOAD_MAX_NUMBER_FIELDS`; `X_FRAME_OPTIONS`. `python manage.py check --deploy` lists many of these and does not touch the network.
+- **Django.** `DEBUG = True`; literal or short `SECRET_KEY`; `ALLOWED_HOSTS = ["*"]`; `SESSION_COOKIE_SECURE`, `CSRF_COOKIE_SECURE`, `SECURE_SSL_REDIRECT`, `SECURE_HSTS_SECONDS` (default 0); `CSRF_TRUSTED_ORIGINS`; `SECURE_PROXY_SSL_HEADER` and `USE_X_FORWARDED_HOST` (trust of proxy headers); `AUTH_PASSWORD_VALIDATORS` (default empty); `PASSWORD_HASHERS`; `DATA_UPLOAD_MAX_MEMORY_SIZE`; `DATA_UPLOAD_MAX_NUMBER_FIELDS`; `X_FRAME_OPTIONS`. `python manage.py check --deploy` lists many of these, but it imports the project and runs its custom checks, so it is target execution (T2).
 - **Django REST framework.** `DEFAULT_PERMISSION_CLASSES` (default `AllowAny`), `DEFAULT_AUTHENTICATION_CLASSES`, throttling classes (none by default).
 - **Flask.** `app.run(debug=True)` or `FLASK_DEBUG` enables the Werkzeug debugger, which allows code execution for anyone who reaches it. `SECRET_KEY` weak or committed. `SESSION_COOKIE_SECURE` default is false. `MAX_CONTENT_LENGTH` default is unset, so there is no body limit.
 - **FastAPI and Starlette.** `/docs`, `/redoc` and `/openapi.json` are on by default (`docs_url`, `redoc_url`, `openapi_url`). `CORSMiddleware` with `allow_origins=["*"]` or a broad `allow_origin_regex`. No body size limit by default. Uvicorn and Gunicorn trust forwarded headers only from `--forwarded-allow-ips` (default loopback); a value of `*` trusts everyone.
@@ -125,7 +125,7 @@ Use only installed tools. Do not install. Record each tool as phase-leads.md sec
 | Tool | Command | Notes |
 |---|---|---|
 | `bandit` | `bandit -r SRC -f json -o OUT.json` | Reads files only. Its tests cover pickle, `yaml`, `shell=True`, `md5` and `mktemp`. Many false hits. |
-| `mypy` | `mypy SRC` | Types find `None` and `str`/`bytes` mixes. Not a security tool. |
+| `mypy` | `mypy --config-file /dev/null SRC` | Types find `None` and `str`/`bytes` mixes. Not a security tool. The project's mypy config can load plugins (target code); use it only at T2. |
 | `semgrep` | `semgrep --config LOCAL_RULES_DIR --metrics=off --disable-version-check SRC` | Local rule files only. Never `--config auto`. |
 | `ruff` (if present) | `ruff check --select S SRC` | `S` rules are the `bandit` family. Offline. |
 | `pip-audit` | Needs a vulnerability database from the network. | Do not run without permission. Otherwise list pinned versions from the lockfile as leads. |

@@ -1,0 +1,3 @@
+# Request
+
+Review this supplied PR snapshot for security regressions. Report only new vulnerabilities introduced by the change. Use source-only analysis; do not execute target code. `base/app.py` is the immutable synthetic base revision and `head/app.py` is the immutable synthetic head revision. Compare those files, not this skill checkout's Git history. These revision labels are fixture identities, not real Git hashes. The evaluator holds content digests to check their integrity. All routing, storage controls, and access policy for each revision are in its source. Explain how you determined whether each relevant issue predates the change. Do not create a finding for a pre-existing bug solely because the changed file contains it.

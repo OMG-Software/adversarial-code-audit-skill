@@ -1,0 +1,8 @@
+{
+  "algorithm": "sha256",
+  "description": "Immutable synthetic revision identities, not Git hashes",
+  "files": {
+    "cases/pr-regression/base/app.py": "4abc26c078e058c1d9cb5508c5ebb815f00ccea4de6bbf2afc8db4ba1f45a044",
+    "cases/pr-regression/head/app.py": "dc149b28dbb7bb96fb51c7b3f3e7ecb931f8e6a08dbc5440af7cb9fe7ddeafe4"
+  }
+}

@@ -102,14 +102,14 @@ Adapt the patterns to the ecosystem. Language files add package-manager details.
 
 ### SUP-04 Known-vulnerable and unmaintained dependencies
 
-- **What fails:** the product ships a component whose weakness is public, or whose upkeep ended, and the code reaches the weak function.
-- **Where to look:** lockfile versions; vendored copies; pinned base images; bundled native libraries in mobile and desktop apps.
+- **What fails:** shipped software or a development, build, test or release workflow uses a component whose weakness is public, or whose upkeep ended, and attacker-controlled input reaches the weak function.
+- **Where to look:** lockfile versions; vendored copies; pinned base images; bundled native libraries in mobile and desktop apps; development dependencies and build-tool plugins used by CI and release workflows.
 - **Questions:**
   - Does the product call the weak function with input an attacker controls?
   - Can the product update this component at all?
 - **Sad-path inputs:** the input class that the advisory names, at the product's call site.
 - **Evidence for confirmed:** the version, the advisory text, and the call path from entry to the weak function. A version match alone is a lead.
-- **Not a finding:** a component version with no reachable call; a development-only dependency that no shipped artefact contains.
+- **Not a finding:** a component version with no reachable vulnerable call in shipped software or development, build, test and release workflows. Absence from shipped artefacts alone does not exclude a development dependency.
 - **CWE:** CWE-1395 (class-level); CWE-1104; CWE-1329 (class-level) when a fixed component has no update path.
 
 ### SUP-05 Install-time and build-time code execution

@@ -123,7 +123,7 @@ Use only installed tools. Do not install. Record each tool as `phase-leads.md` s
 | Tool | Command | Notes |
 |---|---|---|
 | `brakeman` | `brakeman -q --no-pager -f json -o OUT.json APP_DIR` | Static analyser for Rails. Reads files only. Exit code is non-zero when it finds warnings. |
-| `rubocop` | `rubocop --only Security,Rails/OutputSafety SRC` | Cops include `Security/Eval`, `Security/MarshalLoad`, `Security/YAMLLoad`, `Security/Open`, `Security/JSONLoad`. |
+| `rubocop` | `rubocop --only Security,Rails/OutputSafety SRC` | A `require:` in the project's `.rubocop.yml` loads target code: check it first, or use your own config (`-c`). Cops include `Security/Eval`, `Security/MarshalLoad`, `Security/YAMLLoad`, `Security/Open`, `Security/JSONLoad`. |
 | `bundler-audit` | `bundle-audit check` | Uses a local copy of the advisory database. Do not run `update` or `--update` without permission (network). Otherwise list pinned versions from `Gemfile.lock` as leads. |
 | `semgrep` | `semgrep --config LOCAL_RULES_DIR --metrics=off --disable-version-check SRC` | Local rules only. Never `--config auto`. |
 | Syntax | `ruby -wc FILE` | Checks syntax. Does not run the file. |

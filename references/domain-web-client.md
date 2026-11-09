@@ -155,7 +155,7 @@ Add these to `threat-model.md` under a heading "Browser boundary".
 - **Where to look:** tags that load from CDNs and tag managers; analytics, chat, A/B testing and payment widgets; dependencies loaded at run time from a package CDN; missing `integrity` on pinned files; widgets on pages that handle credentials or payments; `target="_blank"` links without `rel="noopener"`.
 - **Questions:**
   - Which third-party code runs on which pages? Does it run on login and payment pages?
-  - Is the URL pinned to a version and checked by SRI? A mutable URL (`latest`) cannot use SRI.
+  - Is the URL pinned to a version and checked by SRI? SRI can pin content at a mutable URL such as `latest`, but an upstream content change then fails the integrity check. Prefer an immutable versioned URL plus SRI where supported.
 - **Sad-path inputs:** none to send. List the sources in the templates of each page class.
 - **Evidence for confirmed:** a finding needs a concrete path: for example a mutable third-party script on a page that shows tokens, or a script source whose domain the project does not control. A missing `integrity` attribute alone is a hardening note. E1.
 - **Not a finding:** a first-party script; a third-party script on a page with no sensitive data.

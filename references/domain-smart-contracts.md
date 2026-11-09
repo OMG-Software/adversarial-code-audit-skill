@@ -70,7 +70,7 @@ Adapt the patterns to the language. The language file adds compiler version, lib
   - Does a guard cover every function that shares the state, or only this one?
   - Does any token or callee in scope have hooks?
 - **Sad-path inputs:** a local test contract that re-enters on receive or on a hook; a malicious token with a callback; a callee that calls a second function of the same system.
-- **Evidence for confirmed:** the call before the write, the re-entry function, and a local test (local test chain or fork in the sandbox) that shows the invariant failing (for example withdrawn twice). E3 is required for the claim that the re-entry works, unless the whole path and state are plain in source (then E1 with a reasoned trace is acceptable for simple cases).
+- **Evidence for confirmed:** the call before the write, the re-entry function, and a local test (local test chain or fork in the sandbox) that shows the invariant failing (for example withdrawn twice). E3 is required for the claim that the re-entry works. A source trace supports the reproduction but does not replace it.
 - **Not a finding:** a call to a trusted, fixed contract with no callback and no shared state; state already updated before the call.
 - **CWE:** CWE-1265 (unintended reentrant invocation of non-reentrant code via nested calls).
 
