@@ -66,7 +66,7 @@ A new run takes the next unused `run-<N>`; never write into an earlier run's dir
 
 Do phases in order. Before a phase, read its reference file. Do not read every domain file. Read only the ones that phase 1 selects.
 
-**`plan.md`** records: target path, commit and dirty state, mode, profile, scope, capability tier, execution choice (isolation level, missing controls, approval mode), budget (if given), output and scratch directories, files created outside scratch, and selected domain and language files with one reason each. For a dirty worktree or a non-Git target, also record a hash of each reviewed file that is modified or untracked, and re-read any that changed before verification and reporting.
+**`plan.md`** records: target path, commit and dirty state, mode, profile, scope, capability tier, execution choice (isolation level, missing controls, approval mode), static tools offered and the user's answer ([references/execution.md](references/execution.md) section 5.1), budget (if given), output and scratch directories, files created outside scratch, and selected domain and language files with one reason each. For a dirty worktree or a non-Git target, also record a hash of each reviewed file that is modified or untracked, and re-read any that changed before verification and reporting.
 
 **Profiles** change breadth, never the evidence bar:
 - **quick** – coarse units (one per surface and domain), one hunt pass, one critique pass. Report says "partial".

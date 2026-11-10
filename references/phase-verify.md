@@ -44,7 +44,7 @@ Examples of disprove outcomes:
 |---|---|
 | Checked elsewhere | A caller, middleware or framework layer already enforces the invariant. |
 | Not attacker-controlled | The value is a constant, comes from config only the operator controls, or comes from an already-trusted principal. |
-| Design authority | The action is within the attacker's allowed design authority. Distinguish attacker and victim: third-party content steering a victim's agent outside the victim's authorized task is not the attacker acting on its own data. |
+| Design authority | The action is within the attacker's allowed design authority. Distinguish attacker and victim: third-party content steering a victim's agent outside the victim's authorized task is not the attacker acting on its own data. For a same-user attacker and an elevated sink, apply [phase-recon.md "Elevation consent"](phase-recon.md#elevation-consent): only class (a) is design authority. |
 | Unreachable | Dead code, test-only, behind a disabled flag, wrong platform, not registered. |
 | Safe by type or framework | Auto-escaping, parameterised query, bounded container, checked arithmetic, typed ID. Confirm the framework version in the repository actually does this. |
 | Wrong sink semantics | The sink does not do what the hunter assumed (the "SQL" is a key-value lookup, the "path" is never used on the filesystem). |

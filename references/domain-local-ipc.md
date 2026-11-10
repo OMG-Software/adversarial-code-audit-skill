@@ -75,7 +75,7 @@ Adapt to the platform. Language files add API names.
   - Does a native messaging manifest list only the intended extension origins?
 - **Sad-path inputs:** a second OS user as the client; a process that created the pipe first; a web page that calls the loopback port; a request with no credential; a client under a different code-signing identity.
 - **Evidence for confirmed:** the endpoint creation, its access control, the operation reachable without a peer check, and which local principal gains it. E1 is usually enough. A squatting race needs E3.
-- **Not a finding:** an endpoint restricted to the same user in a user-private directory, when the threat model excludes same-user malware.
+- **Not a finding:** an endpoint restricted to the same user in a user-private directory, when the threat model excludes same-user malware and the endpoint runs as that user. If the endpoint or entry point runs elevated (an elevation re-entry such as `--elevated-task <file>`, a privileged helper, a polkit action), classify the caller with [phase-recon.md "Elevation consent"](phase-recon.md#elevation-consent) instead.
 - **CWE:** no single checked entry fits all cases. Name the weakness in words ("missing peer authentication on local channel", "endpoint creation without ownership check"). Add CWE-250 if the server runs with high privilege for no need.
 
 ### LI-02 Privileged helper as confused deputy
@@ -213,7 +213,7 @@ This domain often **needs**:
 - **E3 is needed** for races (socket squatting, check-then-use on staged files), for pipe and socket behaviour that depends on default OS security descriptors, and for any claim about platform behaviour not in the repository. Run tests only at the isolation level in `plan.md`, with dummy files, a second dummy user or process, and no real accounts.
 - **Facts usually outside the repository** make a finding `needs-validation`: OS and SDK version defaults (export defaults, keychain classes); the presence of device lock and disk encryption; whether a web page or other app is actually installed; platform store verification of links (domain association files are served by the vendor's domain); policies set by device management.
 - **Reachability:** confirm that the component, handler or listener exists in the default build and platform, and that the attacker is the local principal the threat model includes. Same-user malware is often out of scope. Record the assumption.
-- **Design authority:** a helper or service may do privileged work by design. The defect is that the caller can steer it beyond what the user could do.
+- **Design authority:** a helper or service may do privileged work by design. The defect is that the caller can steer it beyond what the user could do. "Same-user malware is out of scope" never covers a privileged step behind a consent prompt: the attacker has the user's rights but not the user's approval. Use the (a)/(b)/(c) classes in [phase-recon.md "Elevation consent"](phase-recon.md#elevation-consent) and write the class in the finding or hardening note.
 - **Severity examples:**
   - critical – any local user or any web page gains administrator or root code execution through a helper or an update path; a bridge gives remote web content code execution on the device;
   - high – another app or user reads the account's tokens or messages; a link silently performs a payment or sign-in; an exported component exposes private files;

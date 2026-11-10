@@ -50,6 +50,20 @@ List every principal from lowest to highest trust. For each, state what it can d
 
 A principal acting within its own design authority is not an attack. Write the design authority down so hunters can tell the difference.
 
+### Elevation consent
+
+A process running as the user has the user's *rights*, not the user's *consent*. When the product asks a human to approve elevation (Windows UAC on the secure desktop, polkit, `sudo`, macOS Authorization Services, a privileged-helper install prompt), that prompt separates the two. A same-user process can start a prompt but cannot answer one that runs on a secure desktop or reads a password. Never write in `threat-model.md` that a same-user process "can answer" such a prompt. Write what it can do: start the product with chosen arguments, environment and files, and wait for the human to approve.
+
+Classify every path from a same-user process to privileged code as one of:
+
+- **(a) Own prompt.** The attacker raises a prompt for its own program or for a generic OS tool (`msiexec`, `pkexec sh`, `sudo`). The product adds nothing the attacker lacked. **Not a finding.** At most a hardening note.
+- **(b) Borrowed prompt.** The attacker makes the *product* raise a prompt that shows the product's name, icon or publisher. The privileged code then does what the attacker chose (installs its package, runs its command, writes its path). **Finding.** The gain is the trust the prompt borrows: the user approves the product, not the attacker. The user did not ask for this prompt, so lower the likelihood, and cap severity at medium unless the product raises the prompt without a human (an auto-elevating or already-privileged helper).
+- **(c) Hijacked operation.** The attacker changes a privileged operation the user started and expects to approve: replaces a verified file, plants a link at a path the privileged side writes, sets an environment variable, registry value or search path the privileged side reads. **Finding.** No severity cap from consent: the user approved the operation they wanted, and got a different one.
+
+Record the class in every finding and hardening note that involves elevation, with what the prompt actually shows. Does it name what the attacker controls? For example, UAC for an elevated executable names that executable and its signer, and `pkexec` shows the command line. A prompt that names the attacker's package or command moves (b) towards (a).
+
+The class decides only whether same-user access is design authority. It does not lower the evidence bar: races, link behaviour and OS facts still need the evidence that the domain file requires.
+
 ## 1.4 Entry surfaces
 
 Find every place where data from a lower-trust principal enters. For each surface record: file:line, principal, authentication required (yes / no / partial), the parser or framework that decodes it, and the first function that handles it.

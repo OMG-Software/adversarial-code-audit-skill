@@ -110,7 +110,7 @@ For each route, list the extractors. The extractors decide what the attacker con
 
 ## Tools
 
-Run only what is installed. `cargo build`, `cargo check`, `cargo clippy` and `cargo test` run `build.rs` and procedural macros. These are target code: follow `execution.md` before you run them. This list agrees with `phase-leads.md` section 2.1.
+Run what is installed, plus tools the user approved in phase 0 (`execution.md` section 5.1). `cargo build`, `cargo check`, `cargo clippy` and `cargo test` run `build.rs` and procedural macros. These are target code: follow `execution.md` before you run them. `cargo audit` and `cargo deny check advisories` read `Cargo.lock` and run no target code: they are T1, so a missing one is `absent` or `absent-declined`, not `T2-skipped`. This list agrees with `phase-leads.md` section 2.1.
 
 - **clippy.** `cargo clippy --offline --locked --all-targets -- -W clippy::unwrap_used -W clippy::indexing_slicing -W clippy::arithmetic_side_effects -W clippy::cast_possible_truncation -W clippy::undocumented_unsafe_blocks`. The `unwrap_used`, `indexing_slicing`, `arithmetic_side_effects` and `undocumented_unsafe_blocks` lints are in the restriction group. They are noisy. Group the results.
 - **cargo-geiger.** `CARGO_NET_OFFLINE=true cargo geiger` counts `unsafe` per crate. Use it to rank crates.
