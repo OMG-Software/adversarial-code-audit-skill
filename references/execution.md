@@ -97,6 +97,25 @@ b. Run commands at this level for this audit without asking.
 
 Defaults for the approval question: `b` for I3, `a` for I2 and I1.
 
+### 5.1 Missing static tools
+
+In the same message, offer the static tools from [phase-leads.md section 2.1](phase-leads.md#21-static-tools-t1) that fit the target, are absent, and read the target only as data (T1). Typical examples: a lockfile advisory scanner (`cargo-audit`, `cargo-deny`, `osv-scanner`, `pip-audit` on a requirements file, `bundler-audit`), `shellcheck`, `actionlint` or `zizmor`, `gitleaks`, `semgrep` with local rules. Offer advisory or rule databases that those tools need too. Never offer a tool that runs target code as a substitute for the execution choice.
+
+```text
+These read-only tools would help, and are not installed:
+- <tool> <version> from <official release URL>, <size>, SHA-256 <digest or "published checksum at URL">
+- <advisory database> from <URL>, <size>
+I would install them to <user-local path outside the target and the output directory>.
+They read the target's files as data and do not run its code.
+Install them? (all / pick / no)
+```
+
+Rules:
+- Name the exact source, version and destination. Prefer official release artefacts with published checksums, and check the checksum before first use. Record the result in `plan.md`.
+- Approval covers only the listed items and destinations. It does not approve target dependencies, container images, system packages or running target code.
+- A database download sends no target data. A tool that uploads target files, sends telemetry or verifies secrets against live services is still prohibited (SKILL.md section 3, rule 3); run it with its offline or no-telemetry flags.
+- If the user declines, or no one can answer, install nothing. Record each declined or unanswered tool so the report can give the reason (phase-leads.md section 2.1).
+
 **Rules**
 - Never fall back to a weaker level on your own. If the chosen sandbox fails, stop executing and ask again.
 - Silence, a timeout or a default answer is not a choice. In an unattended run (no one can answer), use only a level the user approved before (in `plan.md` or a standing instruction). Otherwise use I0.

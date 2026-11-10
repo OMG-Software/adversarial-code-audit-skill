@@ -100,7 +100,7 @@ Shell scripts have no routes. Input comes from arguments, environment, files, ot
 
 ## Tools
 
-Run only tools that are installed. This section agrees with `phase-leads.md` section 2.1: the multi-language row (Semgrep with local rules, `--metrics=off`) and the secrets row apply. ShellCheck and PSScriptAnalyzer are extra tools for this language.
+Run tools that are installed, plus tools the user approved in phase 0 (`execution.md` section 5.1). This section agrees with `phase-leads.md` section 2.1: the multi-language, CI workflows and secrets rows apply. ShellCheck and PSScriptAnalyzer are extra tools for this language.
 
 | Tool | Offline-safe command | Notes |
 |---|---|---|
@@ -108,7 +108,7 @@ Run only tools that are installed. This section agrees with `phase-leads.md` sec
 | Syntax check | `bash -n script.sh`, `sh -n script.sh`, `dash -n script.sh` | Parses only. Does not run the script. |
 | checkbashisms | `checkbashisms script.sh` | Part of devscripts. Finds Bash-only syntax in `sh` scripts. |
 | PSScriptAnalyzer | `pwsh -NoProfile -Command "Invoke-ScriptAnalyzer -Path . -Recurse -Severity Warning,Error"` | Module must exist already. Rules to read: `PSAvoidUsingInvokeExpression`, `PSAvoidUsingPlainTextForPassword`, `PSAvoidUsingConvertToSecureStringWithPlainText`, `PSAvoidUsingUsernameAndPasswordParams`, `PSUsePSCredentialType`, `PSAvoidUsingBrokenHashAlgorithms`, `PSAvoidUsingCmdletAliases`. |
-| actionlint | `actionlint -no-color` | Reads `.github/workflows`. Reports untrusted context values in `run:` and runs ShellCheck on scripts if present. `zizmor` is another workflow analyser. |
+| actionlint | `actionlint -no-color` | Reads `.github/workflows`. Reports untrusted context values in `run:` and runs ShellCheck on scripts if present. `zizmor --offline` is another workflow analyser. |
 | Semgrep | `semgrep --config ./local-rules --metrics=off .` | Never `--config auto`. |
 | Secrets | `gitleaks`, `trufflehog --no-verification` | Never verify. Never copy values. |
 | Test runners | Bats (`bats test/`), Pester (`Invoke-Pester`) | Test code is target code. See `execution.md`. |

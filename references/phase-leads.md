@@ -8,7 +8,21 @@ At T0, do sections 2.2, 2.4 and 2.5 only. At T1 and above, do all sections.
 
 ## 2.1 Static tools (T1+)
 
-Run only tools that are already installed. Do not install tools. Do not let a tool fetch rules, databases or packages from the network unless the user allows it. Record each tool, its version, its command and its result count in `leads.md`, including tools that failed or were absent. The report lists them.
+Run tools that are already installed, plus tools the user approved in phase 0 ([execution.md section 5.1](execution.md#51-missing-static-tools)). Never install a tool, or let a tool fetch rules, databases or packages from the network, without that approval. Record each tool, its version, its command and its result count in `leads.md`, including tools that failed or were absent. The report lists them.
+
+Every tool that fits the target but did not run gets exactly one reason in the `leads.md` tool table:
+
+| Reason | Meaning |
+|---|---|
+| `absent` | Not installed, and not offered (say why: no official artefact, no checksum, wrong OS). |
+| `absent-declined` | Offered in phase 0; the user declined or did not answer. |
+| `T2-skipped` | The tool runs target code (build scripts, plugins, executable configuration), and the execution choice does not allow it. |
+| `network-declined` | Installed, but needs a network fetch the user did not approve and no local database exists. |
+| `failed` | Ran and did not complete. Give the error. |
+
+Do not merge reasons. `cargo audit` reads only `Cargo.lock`: if it is missing, its reason is `absent` or `absent-declined`, never `T2-skipped`.
+
+**Dependency fallback (required).** If no advisory scanner ran against a lockfile, write the pinned versions of the security-relevant dependencies (TLS, crypto, parsers, archive and compression, HTTP, serialisation, auth) as leads, and state in the report: "Dependency advisories were not checked against a vulnerability database." Phase 6 marks any version-based claim `needs-validation`.
 
 Some analysers load the target's build or configuration, which runs target code (see [execution.md](execution.md) section 1). The Notes column marks them **T2**: run them only at the isolation level the user chose, or skip them at T1. Never run tools from inside the target (`node_modules/.bin`, `vendor/bin`, wrappers).
 
@@ -26,10 +40,11 @@ Some analysers load the target's build or configuration, which runs target code 
 | Swift, Objective-C | `swiftlint`; Clang static analyser through `xcodebuild analyze` | `xcodebuild` runs build phases and plugins: **T2**. |
 | Lua | `luacheck` | |
 | Shell | `shellcheck`; `PSScriptAnalyzer` for PowerShell | |
+| CI workflows | `actionlint -no-color`; `zizmor --offline` | Both read workflow files as data. `actionlint` calls `shellcheck` on `run:` blocks if it is installed. |
 | SQL | `sqlfluff` | Linting only. Read stored code for logic. |
 | Multi-language | `semgrep` with local rule files and `--metrics=off`; `codeql` if a database can be built offline | `semgrep --config auto` uses the network. Do not use it without permission. Do not use rule files from the target. Building a CodeQL database for a compiled language runs the build: **T2**. |
 | Secrets | `gitleaks`, `trufflehog --no-verification` | Verification sends secrets to live services. Never verify. Never copy secret values into audit files. |
-| Dependencies | `osv-scanner` with an offline database, or the lockfile itself | Without a vulnerability database, list pinned versions of security-relevant dependencies as leads for phase 6 to mark `needs-validation`. |
+| Dependencies | `osv-scanner` in offline mode with a local database (the flag differs between versions: check `--help`); per-ecosystem lockfile scanners (`cargo audit --no-fetch`, `cargo deny check advisories --disable-fetch`, `bundler-audit check --no-update`), or the lockfile itself | Lockfile scanners read the lockfile as data (T1). Scanners that query an online service send the dependency list to a third party: only with the user's approval. Without a vulnerability database, apply the dependency fallback above. |
 
 Treat every tool result as a lead. Most alerts are noise. Do not copy alerts into `leads.md` one by one when there are many. Group them by rule and location, and keep the groups that touch an entry surface or boundary from `threat-model.md`.
 

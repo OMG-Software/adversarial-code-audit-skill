@@ -25,7 +25,7 @@ Focused mode writes a report only when requested and uses the relevant sections 
 - Target, commit, dirty state, and the date of the run.
 - Mode, profile, scope, capability tier, budget used against budget planned.
 - Domain and language files used, and the excluded ones with reasons.
-- Tools run, with versions. Tools not available, and what that means for coverage.
+- Tools run, with versions. Each tool that fits the target but did not run, with its one reason from [phase-leads.md section 2.1](phase-leads.md#21-static-tools-t1) (`absent`, `absent-declined`, `T2-skipped`, `network-declined`, `failed`), and what that means for coverage. If no advisory scanner ran, include the sentence "Dependency advisories were not checked against a vulnerability database."
 - Execution: the isolation level the user chose (I0–I3), missing controls, approval mode, and how many reproductions ran at each level, completed or not. If any ran at I1 or I2, say so in one plain sentence. Never call host guards a sandbox.
 - Verification: independent sub-agents, or a separate pass by the same agent.
 - Scratch cleanup: what was removed and what was kept (execution.md section 8).
@@ -117,6 +117,7 @@ Before you finish, check:
 3. Counts in sections 2, 3 and 9 match the files.
 4. No `needs-validation` or unverified finding has a severity in the report.
 5. No secret value appears anywhere in the output directory.
+6. Same principal, same boundary, same decision. Group every finding, hardening note and dropped lead by (attacker principal, boundary). Within a group, if one item is a finding and another was dropped or kept as hardening because of "same-user", "design authority" or "out of scope", the second must state the rule that separates it (for elevation, its class from [phase-recon.md "Elevation consent"](phase-recon.md#elevation-consent)). Otherwise write it as a candidate and send it back to phase 6 for a verdict; the report itself does not change its status. Check this too: a variant that needs more attacker steps than a dropped item must not be the only one raised.
 
 Write the result of the check at the end of `REPORT.md` as one line: "Consistency check: passed" or the list of problems fixed.
 
