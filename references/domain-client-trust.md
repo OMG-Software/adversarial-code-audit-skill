@@ -30,7 +30,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Client authority". Keep it short.
+Add these to `domain-notes.md` under a heading "Client authority". Keep it short.
 
 1. **Authority map.** For each piece of state: who computes it (server, client, both), where the authoritative copy lives, and what the client may send about it.
 2. **Message catalogue.** Every client-to-server message or call, its fields, the server validation of each field, and whether it changes shared state.

@@ -4,10 +4,10 @@ Goal: for each coverage unit, decide whether the boundary holds. If it does not,
 
 Inputs for each unit:
 - the unit row from `coverage.md`;
-- `threat-model.md`;
-- the selected domain file(s) for the unit, and the language file;
+- `threat-model.md`, and the heading for the unit's domain in `domain-notes.md`;
+- the selected domain file(s) for the unit, and the language file (the phase 3 sections that [SKILL.md section 5](../SKILL.md) lists);
 - open leads for the unit from `leads.md`;
-- fingerprints of known findings (from earlier runs) that you must not report again.
+- the known findings that you must not report again: those carried forward from earlier runs, and those rejected or fixed there (fingerprint, `root-cause-at` and one line each).
 
 Do not read other hunters' finding files before you hunt a unit. They anchor you on what someone already found.
 
@@ -72,7 +72,7 @@ Stop when the invariant is settled, either way. Do not keep reading code that ca
 ### Step 6 – Write the candidate
 
 If the invariant fails on a path from the entry to the sink:
-1. Fill the finding template. Status `proposed`.
+1. Check for a duplicate. Work out your `root-cause-at` value: the file and function where the control fails or is missing. Compare it with the Header of each existing finding file. Read the Header only, so that another hunter's reasoning does not anchor you. If a file has the same value and the same control fails, add your path to that file as a variant and stop here. Otherwise fill the finding template. Status `proposed`.
 2. Set the evidence level honestly. If a step depends on runtime behaviour you did not observe, say which step.
 3. Search for **variants**: the same root cause in other places. Use three searches:
    - lexical: the same function, call or pattern;
@@ -135,6 +135,9 @@ Execution: <isolation level I0-I3, approval mode, wrapper command, scratch direc
 Threat model:
 <threat-model.md>
 
+Domain notes:
+<the heading for this domain in domain-notes.md>
+
 Your unit(s):
 <unit rows from coverage.md>
 
@@ -147,7 +150,7 @@ Language guidance:
 Open leads for your unit(s):
 <lead rows>
 
-Known findings (do not report again): <fingerprints and one-line root causes>
+Known findings (do not report again): <fingerprints, root-cause-at values and one-line root causes>
 Units owned by other hunters (do not hunt): <IDs>
 
 Method:
@@ -168,6 +171,6 @@ The orchestrator checks each result before it updates `coverage.md`:
 - every assigned unit has a status;
 - `covered` and `candidate` units have paths and checks;
 - every finding has all six contract fields from SKILL.md section 6;
-- no finding repeats a known fingerprint.
+- no finding repeats a known fingerprint or a known `root-cause-at` value. Two hunters often name one root cause differently: merge the repeat into the existing file as a variant.
 
 A result that fails these checks leaves the unit `planned` for another hunter.

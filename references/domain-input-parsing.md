@@ -27,7 +27,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add a heading "Parser inventory" to `threat-model.md`. Use one row for each parser or decoder that handles lower-trust input.
+Add a heading "Parser inventory" to `domain-notes.md`. Use one row for each parser or decoder that handles lower-trust input.
 
 | Format or input | Library or hand-written | Version and configuration | Entry (file:line) | Source trust | Output used by | Second parser of the same input |
 |---|---|---|---|---|---|---|

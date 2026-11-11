@@ -1,10 +1,10 @@
 # Focused and diff reviews
 
-Use this route for a named finding, file, function, domain or diff. A report request does not expand that scope.
+Use this route for a named finding, file, function or diff, or for one question about one boundary. A report request does not expand that scope. A subsystem, a directory or a whole domain needs the coverage ledger: that is a scoped Full audit (SKILL.md section 1).
 
 ## Setup and scope
 
-Use the output directory and snapshot rules in SKILL.md section 4. Write a short `plan.md`: scope, commit or file hashes, tier, execution choice (or I0), output and scratch paths and relevant references. Do not create a full coverage ledger for one finding.
+Use the output directory and snapshot rules in SKILL.md section 4. Write a short `plan.md` from [the plan template](../assets/plan-template.md): fill the sections that its first comment lists for Focused mode (scope, commit or file hashes, tier, execution choice or I0, output and scratch paths, relevant references), and write "n/a" in the rest. Do not create a full coverage ledger for one finding.
 
 Write a small `threat-model.md` with the attacker, design authority, entry, asset, boundary, control and decisive external assumptions. It can contain one row. For multiple boundaries, assign local unit IDs there. Use these IDs as `coverage-units` in the finding template; do not reference a nonexistent `coverage.md`.
 

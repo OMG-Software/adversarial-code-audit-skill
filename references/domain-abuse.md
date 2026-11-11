@@ -32,7 +32,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Anti-abuse controls".
+Add these to `domain-notes.md` under a heading "Anti-abuse controls".
 
 1. **Abuse scenario list.** From the product's features, list the scenarios a bad actor would run at scale: mass sign-up, spam, scraping, reward farming, cost inflation, ban evasion, vote manipulation.
 2. **Control inventory.** A table with one row per scenario: control (rate limit, CAPTCHA, email or phone verification, invite gate, quota, block list, moderation queue, reputation score) | key (IP, account, device, tenant, token) | limit and window | store (memory, database, cache) | where enforced (application, gateway, third party) | behaviour on failure. A scenario with no control is a lead. A control that sits outside the repository is an external assumption.

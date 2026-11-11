@@ -31,7 +31,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Resource budget". Keep it short; hunters copy it.
+Add these to `domain-notes.md` under a heading "Resource budget". Keep it short; hunters copy it.
 
 1. **Budget table.** One row for each entry surface. Columns: input dimension the attacker controls | resource used | limit (value, file:line, or "none") | pre-authentication? | scope of the limit (request, connection, principal, tenant, global) | shared pool.
 2. **Pools and queues.** List each worker pool, thread pool, connection pool and queue. Give the size, the bound, the timeout and the fairness rule.

@@ -30,7 +30,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Cryptographic inventory". Keep it short.
+Add these to `domain-notes.md` under a heading "Cryptographic inventory". Keep it short.
 
 1. **Use table.** One row per use: purpose | primitive and mode | key source | nonce or IV source | what it protects | attacker who can modify the data | file:line.
 2. **Key table.** Each key and secret: generation | storage | access | rotation | backup | destruction | purposes it serves.

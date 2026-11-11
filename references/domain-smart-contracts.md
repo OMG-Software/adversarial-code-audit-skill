@@ -30,7 +30,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Contract surface". Keep it short.
+Add these to `domain-notes.md` under a heading "Contract surface". Keep it short.
 
 1. **Contract inventory.** Each contract or program, its inheritance or modules, proxy pattern, deployed addresses (if known), and the admin or upgrade authority.
 2. **External entry map.** Every public or external function, its caller restrictions, state it changes, external calls it makes and value it moves.

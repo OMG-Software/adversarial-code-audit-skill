@@ -2,7 +2,7 @@
 
 Goal: find attacks that need more than one step. Units are hunted one at a time, so single-unit hunts miss attacks that cross units or domains. A chain of low-impact problems can have high impact.
 
-Inputs: `threat-model.md` (attacker goals), all finding files (any status except `rejected`), `hardening.md`, the `coverage.md` checks.
+Inputs: `threat-model.md` (attacker goals), all finding files (any status except `rejected` and `fixed`), `hardening.md`, the "Chain primitives" section of each selected domain file, the `coverage.md` checks.
 
 Output: chained finding files, and links from component findings to chains.
 
@@ -41,6 +41,7 @@ Then check common chain shapes:
 
 - Each link must be established: a `proposed` or `confirmed` finding, a documented feature, or a source-traced step. Do not assume a link.
 - If any link is `needs-validation`, the chain is `needs-validation`, with that link's missing fact as the blocker.
+- Chains are built here from findings that phase 6 has not verified yet. Phase 6 verifies the component findings first, then the chain. If it rejects a link, or finds a carried link `fixed`, look for another established primitive that gives the same step. If none exists, the chain is `rejected`, with the lost link as the reason.
 - A chain gets its own finding file, fingerprint `chain.<goal>.<short-name>`, domain `chain`. Its path lists every step across all links, in order. Its Summary names the component findings.
 - Add the chain fingerprint to each component finding under Fix → variants, with "part of chain".
 - The chain's impact is the end-to-end result. A component's own severity does not change because it is in a chain.

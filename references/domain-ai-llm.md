@@ -33,7 +33,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under "AI components".
+Add these to `domain-notes.md` under "AI components".
 
 1. **Model calls.** Each call site: model or provider, what goes into the prompt (system text, user text, retrieved text, tool results, memory), who writes each part.
 2. **Trust labels.** For each prompt part: who controls it (operator, requester, third party, other user).

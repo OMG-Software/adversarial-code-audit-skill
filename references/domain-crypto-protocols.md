@@ -29,7 +29,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Protocol model". Keep it short.
+Add these to `domain-notes.md` under a heading "Protocol model". Keep it short.
 
 1. **Parties and trust.** Who the endpoints are. What the server may do (relay only, store, see metadata, hold keys). The attacker positions: network, server, peer, other device.
 2. **State machine table.** State | messages accepted | next state | what is authenticated at that point.

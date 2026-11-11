@@ -1,0 +1,27 @@
+{
+  "purpose": "Check that the skill's description loads the skill for security audits of source code, and not for other work. Give each query to a fresh agent that has this skill and other review skills installed. Record whether this skill loads.",
+  "should_trigger": [
+    "run a security audit of this repo",
+    "can you scan this codebase for vulnerabilities before we open-source it",
+    "is the missing ownership check in api/invoices.py actually exploitable, or a false positive?",
+    "review this PR for security regressions",
+    "red-team the auth module",
+    "how do I spot SSRF when I read source code?",
+    "we got a bug bounty report that claims an IDOR in /export. validate it against the code",
+    "pen-test the source of our payment service",
+    "look for injection bugs in the reporting subsystem",
+    "audit our IaC and CI workflows in this repo for security problems"
+  ],
+  "should_not_trigger": [
+    "review this PR",
+    "why is this endpoint so slow?",
+    "audit our dependencies for license compliance",
+    "run nmap against staging.example.com and tell me what is open",
+    "refactor the auth module to use dependency injection",
+    "write unit tests for invoices.py",
+    "scan our production API for vulnerabilities",
+    "fix the failing lint job in CI",
+    "explain what this function does",
+    "audit the accessibility of our React components"
+  ]
+}

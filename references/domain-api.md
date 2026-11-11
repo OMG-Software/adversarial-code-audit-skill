@@ -33,7 +33,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "API surface".
+Add these to `domain-notes.md` under a heading "API surface".
 
 1. **Endpoint inventory.** One row per endpoint: method, path or procedure name, handler, auth layer, documented (yes or no), version, caller type (browser, mobile, partner, internal). Build it from route registration in code, not from the documentation. Then add the documented endpoints. The difference in each direction is a lead.
 2. **Registration styles.** List every way the code registers an endpoint: route tables, annotations, file-system routing, plugins, server actions, RPC procedures, GraphQL fields, WebSocket message types. A style that the inventory missed is a lead.

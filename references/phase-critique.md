@@ -4,7 +4,7 @@ Goal: find what the hunt missed. The critic proposes coverage, not findings.
 
 Use a fresh agent if you have sub-agents. Otherwise start a separate pass and read the files as if another team wrote them.
 
-Inputs: `plan.md`, `threat-model.md`, `coverage.md`, `leads.md`, the list of finding files (titles and fingerprints only).
+Inputs: `plan.md`, `threat-model.md`, `domain-notes.md`, `coverage.md`, `leads.md`, the list of finding files (titles, fingerprints and `root-cause-at` values only).
 
 Output: changes to `coverage.md` (new units, reopened units) and a critique log at the end of `coverage.md`.
 
@@ -23,9 +23,11 @@ Do every check. Record the result of each, also when it finds nothing.
 5. **Leads.** Every lead is `traced`, `merged` or `dropped` with a reason.
 6. **Variants.** Every finding lists a variant search. Every variant in another unit exists as a lead on that unit.
 7. **Lifecycle.** Units exist for start-up and default configuration, upgrade and migration, error and recovery paths, shutdown and cleanup, where the code has them.
-8. **Unread code (T1+).** Compare the union of all "paths read" with the list of in-scope files. Rank unread files by: reachable from an entry surface, size, churn, security words in the file. Add units for the top unread files that are reachable.
+8. **Unread code (T1+).** Compare the union of all "paths read" with the list of in-scope files. With Python, write the list of in-scope files to a file in the output directory (one repository path per line) and run `python <skill-directory>/scripts/audit_run.py stats <run-directory> --files <list>`: it prints the unread files. Rank unread files by: reachable from an entry surface, size, churn, security words in the file. Add units for the top unread files that are reachable.
 9. **Blocked units.** For each `blocked` unit, decide if another permitted approach can finish it. Use another starting point or smaller split without expanding scope. A different execution option requires the user's selection under execution.md; do not bypass a safety limit to improve coverage. Reopen feasible units with that approach in Notes.
 10. **History.** Each variant seed from phase 2.3 has been checked.
+11. **Duplicates.** No two finding files have the same `root-cause-at` value with the same failing control. Merge duplicates into the older fingerprint, and keep the other path as a variant.
+12. **Domain notes.** Every selected domain has its heading in `domain-notes.md`, and each surface or boundary named there has a unit.
 
 ## 4.2 Loop and stop
 
@@ -56,5 +58,7 @@ At the end of the last critique, add:
 - in-scope files, files read at least once, percentage;
 - entry surfaces with at least one `covered` or `candidate` unit, percentage;
 - attacker goals covered, percentage.
+
+Count, do not estimate. With Python, `audit_run.py check <run-directory>` prints the units by status and `audit_run.py stats <run-directory> --files <list>` prints the file numbers. Without it, count from the ledger and say that the numbers were counted by hand.
 
 These numbers go into the report. They describe effort, not safety. A file that was read is not proved safe.

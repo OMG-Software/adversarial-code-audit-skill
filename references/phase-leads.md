@@ -26,13 +26,25 @@ Do not merge reasons. `cargo audit` reads only `Cargo.lock`: if it is missing, i
 
 Some analysers load the target's build or configuration, which runs target code (see [execution.md](execution.md) section 1). The Notes column marks them **T2**: run them only at the isolation level the user chose, or skip them at T1. Never run tools from inside the target (`node_modules/.bin`, `vendor/bin`, wrappers).
 
+**Run tools from outside the target.** Start each tool in a working directory outside the target (the output directory is a good choice) and pass the target path as an argument. Toolchain launchers act on files in the working directory:
+
+- rustup downloads the toolchain named in `rust-toolchain.toml`;
+- corepack downloads the package manager named by `packageManager` in `package.json`;
+- `yarn` runs the script that `yarnPath` names;
+- `go` downloads the toolchain named in `go.mod`;
+- version managers may switch or install versions from `.tool-versions`, `.python-version` or `.nvmrc`.
+
+A download that a target file starts still needs approval (SKILL.md section 3, rule 5), and a script from the target is target code. If a tool only works inside the target, pin the toolchain first (`RUSTUP_TOOLCHAIN=<an installed toolchain>`, `GOTOOLCHAIN=local`, `COREPACK_ENABLE_NETWORK=0`), or treat the tool as **T2**.
+
+**Target files can also blind a tool.** Ignore files, baselines and allow-lists in the target make a scanner skip paths or rules without saying so: `.gitleaks.toml`, `.gitleaksignore`, `.semgrepignore`, `.shellcheckrc`, `.bandit`, `.eslintignore`, `.trivyignore`, baseline files. Where the tool allows it, run it with your own configuration and record that in the tool table. Otherwise read the ignore file as data, and treat each excluded path or rule that touches an entry surface as a lead, like a suppression comment.
+
 | Language or area | Tools to try (if present) | Notes |
 |---|---|---|
 | C, C++ | compiler with `-Wall -Wextra -Wconversion -Wsign-conversion -Wshadow -Wformat=2`, `clang-tidy` (`bugprone-*`, `cert-*`, `clang-analyzer-*`, `cppcoreguidelines-*`), `cppcheck`, `scan-build` | Use the project's compile database if present (`compile_commands.json`). `scan-build` runs the build: **T2**. |
-| Rust | `cargo clippy`, `cargo geiger` (unsafe count), `cargo audit` (offline DB only), `cargo deny check --disable-fetch` | `cargo clippy` and `cargo geiger` run `build.rs` and procedural macros: **T2**. |
+| Rust | `cargo clippy`, `cargo geiger` (unsafe count), `cargo audit` (offline DB only), `cargo deny check --disable-fetch` | `cargo clippy` and `cargo geiger` run `build.rs` and procedural macros: **T2**. Call the lockfile scanners as their own programs (`cargo-audit audit --no-fetch -f <target>/Cargo.lock`) with `RUSTUP_TOOLCHAIN` set, so that rustup does not fetch the target's toolchain. |
 | Go | `go vet`, `staticcheck`, `gosec`, `govulncheck` (needs DB) | With cgo, loading packages can run the C toolchain and `#cgo` flags: treat as **T2**. |
 | Python | `bandit`, `pip-audit` (needs DB), `mypy` | `mypy` loads plugins named in the project's config: **T2** unless run with a clean config. |
-| JS/TS | `eslint` with security plugins, `tsc --noEmit`, `npm audit` (needs network) | A JavaScript ESLint config (`eslint.config.js`, `.eslintrc.js`) is target code: **T2**, or use your own config with `--no-config-lookup`. |
+| JS/TS | `eslint` with security plugins, `tsc --noEmit`, `npm audit` (needs network) | A JavaScript ESLint config (`eslint.config.js`, `.eslintrc.js`) is target code: **T2**, or use your own config with `--no-config-lookup`. Do not start `yarn` or `pnpm` in the target: `yarnPath` and corepack make them run or download what the target names. |
 | JVM | `spotbugs` with `find-sec-bugs`, `pmd` | SpotBugs needs compiled classes; building them with Maven or Gradle is **T2**. |
 | .NET | Roslyn analyzers through `dotnet build` (with the project's analyzer settings) | `dotnet build` runs MSBuild targets, analyzers and source generators: **T2**. |
 | PHP | `php -l`, `phpstan`, `psalm` (taint analysis), `phpcs` with security rules | PHPStan and Psalm load the project's autoloader and bootstrap files: **T2**. |
@@ -43,7 +55,7 @@ Some analysers load the target's build or configuration, which runs target code 
 | CI workflows | `actionlint -no-color`; `zizmor --offline` | Both read workflow files as data. `actionlint` calls `shellcheck` on `run:` blocks if it is installed. |
 | SQL | `sqlfluff` | Linting only. Read stored code for logic. |
 | Multi-language | `semgrep` with local rule files and `--metrics=off`; `codeql` if a database can be built offline | `semgrep --config auto` uses the network. Do not use it without permission. Do not use rule files from the target. Building a CodeQL database for a compiled language runs the build: **T2**. |
-| Secrets | `gitleaks`, `trufflehog --no-verification` | Verification sends secrets to live services. Never verify. Never copy secret values into audit files. |
+| Secrets | `gitleaks` with `--redact`, `trufflehog --no-verification` | Both print the matched secret unless told not to. Always pass `--redact` to `gitleaks`. For any other scanner, do not save or quote its raw output: keep the file, line, commit and rule only. Verification sends secrets to live services. Never verify. Never copy secret values into audit files. |
 | Dependencies | `osv-scanner` in offline mode with a local database (the flag differs between versions: check `--help`); per-ecosystem lockfile scanners (`cargo audit --no-fetch`, `cargo deny check advisories --disable-fetch`, `bundler-audit check --no-update`), or the lockfile itself | Lockfile scanners read the lockfile as data (T1). Scanners that query an online service send the dependency list to a third party: only with the user's approval. Without a vulnerability database, apply the dependency fallback above. |
 
 Treat every tool result as a lead. Most alerts are noise. Do not copy alerts into `leads.md` one by one when there are many. Group them by rule and location, and keep the groups that touch an entry surface or boundary from `threat-model.md`.
@@ -60,10 +72,16 @@ Keep a hit only if it is on or near a path from an entry surface. Record the pat
 
 The history of a codebase shows where it was weak before. Bugs cluster, and fixes are often incomplete.
 
-1. **Security fixes.** `git log --oneline -i -E --grep='secur|vuln|cve|exploit|overflow|inject|xss|csrf|ssrf|bypass|auth|permission|sanitiz|escape|leak|dos|crash|fuzz|race'`. For each relevant commit, read the diff. Record the root cause as a **variant seed**: phase 3 searches for the same root cause in other places, and checks that the fix covers all paths.
-2. **Reverts.** `git log --oneline -i --grep='revert'`. A reverted security fix can leave the bug in place.
-3. **Removed checks.** `git log -S '<central control name>' --oneline` for each central control in `threat-model.md`. Read commits that remove a call.
-4. **Churn.** `git log --since='1 year ago' --name-only --format='' | sort | uniq -c | sort -rn | head -30`. High churn in security code is a priority signal.
+Every command below uses the safe Git form from [execution.md section 1](execution.md#1-what-counts-as-target-code). Set it first in each shell, and run from the target root:
+
+```sh
+G="git -c core.fsmonitor=false -c core.hooksPath=/dev/null --no-pager --no-optional-locks"
+```
+
+1. **Security fixes.** `$G log --oneline -i -E --grep='secur|vuln|cve|exploit|overflow|inject|xss|csrf|ssrf|bypass|auth|permission|sanitiz|escape|leak|dos|crash|fuzz|race'`. For each relevant commit, read the diff with `$G show --no-ext-diff --no-textconv <commit>`. Record the root cause as a **variant seed**: phase 3 searches for the same root cause in other places, and checks that the fix covers all paths.
+2. **Reverts.** `$G log --oneline -i --grep='revert'`. A reverted security fix can leave the bug in place.
+3. **Removed checks.** `$G log --no-ext-diff --no-textconv -S '<central control name>' --oneline` for each central control in `threat-model.md`. Read commits that remove a call.
+4. **Churn.** `$G log --since='1 year ago' --name-only --format='' | sort | uniq -c | sort -rn | head -30`. High churn in security code is a priority signal.
 5. **Secrets in history.** If a secrets tool is present, scan history too. Record the commit, path and type only.
 
 Use history as leads only. A commit message is not evidence of a current bug.

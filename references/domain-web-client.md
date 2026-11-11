@@ -30,7 +30,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Browser boundary".
+Add these to `domain-notes.md` under a heading "Browser boundary".
 
 1. **Origins.** List every origin the product serves or uses: app, API, static, upload, user-content, admin, marketing, extension pages.
 2. **Credential map.** For each credential (cookie, bearer token, API key): where it is stored, attributes, which origins send it, how JavaScript reaches it.

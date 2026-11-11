@@ -27,7 +27,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add a heading "Sandbox model" to `threat-model.md`:
+Add a heading "Sandbox model" to `domain-notes.md`:
 
 1. **Guests.** Each kind of untrusted code: who writes it, how it gets in (upload, marketplace, config, chat, model output), and who is affected when it runs (only its author, other users, the operator).
 2. **Runtimes.** The interpreter, engine or isolate, its version, and the sandbox mode used (for example a restricted environment, a separate process, a WASM runtime, an OS sandbox).

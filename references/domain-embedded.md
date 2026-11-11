@@ -30,7 +30,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Device security map". Keep it short.
+Add these to `domain-notes.md` under a heading "Device security map". Keep it short.
 
 1. **Boot chain.** Table: stage | location (ROM, internal flash, external flash, RAM) | verified by | where the key or hash lives | action on failure | modes that skip verification (recovery, firmware load, manufacturing).
 2. **Image format.** Header fields, bytes that the signature covers, where version and rollback counter live, slot layout, how the verified bytes are found again at run time.
