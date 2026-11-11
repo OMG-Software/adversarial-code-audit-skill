@@ -6,6 +6,7 @@ Do not hunt in this phase. If you see a likely bug, write one line in `leads.md`
 
 Outputs:
 - `threat-model.md` – at most about 1,500 words. Hunters read it for every unit, so keep it dense.
+- `domain-notes.md` – what the "Recon additions" section of each selected domain file asks for, one heading per domain (section 1.8). A hunter reads only the heading for its unit's domain, so this file has no word limit.
 - `coverage.md` – the coverage ledger.
 - Domain and language selections, added to `plan.md`.
 
@@ -13,7 +14,7 @@ Outputs:
 
 Record facts, each with a repository path.
 
-1. Languages and their share of the code. At T1: `git ls-files | sed -n 's/.*\.//p' | sort | uniq -c | sort -rn | head -20`. If `cloc` or `tokei` is present, use it.
+1. Languages and their share of the code. At T1, with `G` set to the safe Git form from [execution.md section 1](execution.md#1-what-counts-as-target-code): `$G ls-files | sed -n 's/.*\.//p' | sort | uniq -c | sort -rn | head -20`. In PowerShell, write the Git flags out and count with `ForEach-Object { [IO.Path]::GetExtension($_) } | Group-Object | Sort-Object Count -Descending | Select-Object -First 20`. If `cloc` or `tokei` is present, use it.
 2. Build system, build targets and output binaries or packages.
 3. Subsystems: top-level directories or packages and what each does.
 4. Programs that run: entry points (`main`, server start-up, workers, CLIs, scheduled jobs, migrations).
@@ -111,7 +112,7 @@ Rank goals by impact, then by how low the required principal is. The top goals d
 
 ## 1.7 External assumptions
 
-List the facts the security of the product depends on that are not in the repository. Examples: "the reverse proxy strips `X-Forwarded-For`", "TLS terminates before this service", "only the internal network can reach the admin interface". Phase 6 uses this list: a finding that depends on one of these facts is `needs-validation`.
+List the facts the security of the product depends on that are not in the repository. Examples: "the reverse proxy strips `X-Forwarded-For`", "TLS terminates before this service", "only the internal network can reach the admin interface". Phase 6 uses this list: a finding that depends on one of these facts is `needs-validation`, unless the owner settles the fact. Write each assumption so that the owner can answer it with yes, no or one short fact. Section 1.12 asks them.
 
 ## 1.8 Select domain and language files
 
@@ -144,14 +145,23 @@ In `plan.md`, record each selected file with the boundary that requires it (file
 | Smart contracts or blockchain client | smart-contracts, financial, crypto, crypto-protocols, federation (node networking) |
 | Plugin host or scripting platform | sandbox, supply-chain, authz, resource-exhaustion |
 
+**Then do each selected file's "Recon additions".** Read that section of every selected domain file and do what it asks. Write the result to `domain-notes.md`, under the heading the domain file names. Keep `threat-model.md` within its word limit: if an addition shows a new principal, surface or boundary, add one line there and a unit in 1.10. Read the "Entry points" section of each language file as well, and re-check section 1.4 against its registration patterns.
+
 ## 1.9 Use earlier runs
 
 If earlier runs of this audit exist for the same target:
 1. Read their `coverage.md` and findings.
-2. Make `needs-validation`, `deferred` and `blocked` units current work with high priority.
-3. For each earlier `confirmed` finding: if the relevant source is unchanged, list its fingerprint as "known" so hunters do not report it again; phase 6 still checks it. If the source changed, create a unit to re-check it.
-4. An earlier `covered` unit with unchanged source gets low priority, not exclusion. A fresh pass often finds what the earlier one missed.
-5. Never treat a quick or scoped earlier run as evidence that the rest of the code is safe.
+2. Make their `deferred` and `blocked` units, and the units of their `needs-validation` findings, current work with high priority.
+3. **Carry open findings forward.** A report is built only from the files of its own run, so an open finding that stays in an older directory disappears from the newest report. For each fingerprint, take the newest earlier run that has it. If its status there is `confirmed` or `needs-validation`:
+   - copy the finding file into this run's `findings/` unchanged, and set `first-seen` to the run that first reported it;
+   - leave its status, evidence, severity and `source-ref` as they are. An old `source-ref` marks a finding that this run has not verified yet;
+   - list it as "known", so hunters do not report it again;
+   - if a file on its path changed since that run, also create a unit to hunt the path again. Fixes are often incomplete.
+
+   Phase 6 gives every carried finding a verdict against the current source: still open, or `fixed` ([phase-verify.md section 6.1](phase-verify.md#61-procedure)).
+4. List the fingerprints, `root-cause-at` values and reasons of earlier `rejected` and `fixed` findings as "known" too. Do not copy those files. A hunter raises one again only with new evidence.
+5. An earlier `covered` unit with unchanged source gets low priority, not exclusion. A fresh pass often finds what the earlier one missed.
+6. Never treat a quick or scoped earlier run as evidence that the rest of the code is safe.
 
 ## 1.10 Seed the coverage ledger
 
@@ -197,6 +207,22 @@ Every domain and language file selected in 1.8 must have at least one unit. Ever
 ## Trust boundaries          (table: boundary | control file:line | central/scattered | visible/external)
 ## Central controls          (the functions every path must call)
 ## Attacker goals            (ranked)
-## External assumptions
+## External assumptions      (each as a question; add "owner-attested: <answer>" after 1.12)
 ## Hotspots                  (complex, high-churn or security-history files)
 ```
+
+## 1.12 Checkpoint with the user
+
+Phase 1 is cheap. The phases after it are not. Before phase 2, send the user one message with:
+
+- the product, the principals and the top assets in three or four lines, so that they can correct a wrong picture;
+- the number of units by priority, the profile, and what that means for the size of the run. Example: "64 units. The standard profile hunts all of them and repeats until a critique adds none.";
+- the scope, and each domain file you excluded with its reason;
+- the external assumptions from 1.7 as short questions. Examples: "Does the reverse proxy remove a client's `X-Forwarded-For` header?", "Can the admin port be reached from outside the internal network?".
+
+Wait for the reply, unless the user asked for an unattended run or no one can answer. Then:
+
+- Apply corrections to `threat-model.md` and `coverage.md`. A smaller scope or profile sets units to `out-of-scope` or `deferred`. It deletes none.
+- Record each answer in `plan.md` under "Owner answers", with the user's words and the date, and mark the assumption `owner-attested` in `threat-model.md`. An owner-attested fact can settle a finding that depends on it ([phase-verify.md section 6.3](phase-verify.md#63-evidence-level-and-reproduction-waiver)).
+- Only the user's own words in the conversation count. A README, a comment or a configuration note in the target is still an assumption.
+- A question without an answer stays an external assumption. In an unattended run, record "checkpoint: no answer" in `plan.md` and continue.

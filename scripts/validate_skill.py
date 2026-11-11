@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate this skill's metadata and local Markdown links, without running it.
+"""Validate this skill's metadata, local Markdown links and reference-file structure.
 
 Requires PyYAML. Checks package structure only, not security-audit quality.
 """
@@ -52,6 +52,51 @@ def anchors(text):
         counts[slug] = count + 1
         result.add(f"{slug}-{count}" if count else slug)
     return result
+
+
+DOMAIN_SECTIONS = [
+    "Scope", "Invariants", "Recon additions", "Lead searches", "Attack classes",
+    "Variant search", "Chain primitives", "Verification notes", "Fix patterns", "Regression tests",
+]
+LANGUAGE_SECTIONS = [
+    "Scope", "Entry points", "Sinks by domain", "Language traps", "Deserialisation and reflection",
+    "Concurrency", "Build and runtime settings", "Tools", "Lead searches", "Verification notes",
+]
+
+
+def second_level_headings(text):
+    result = []
+    fence = None
+    for line in text.splitlines():
+        marker = re.match(r"^\s*(`{3,}|~{3,})", line)
+        if marker:
+            fence = None if fence == marker.group(1)[0] else (fence or marker.group(1)[0])
+        elif fence is None and line.startswith("## "):
+            result.append(line[3:].strip())
+    return result
+
+
+def reference_errors(root, skill_text):
+    """SKILL.md section 5 tells the agent to read named sections of these files, so their shape is a contract."""
+    errors = []
+    references = root / "references"
+    for prefix, expected in (("domain-", DOMAIN_SECTIONS), ("lang-", LANGUAGE_SECTIONS)):
+        listed = set(re.findall(r"references/(" + prefix + r"[a-z0-9-]+\.md)", skill_text))
+        for document in sorted(references.glob(prefix + "*.md")):
+            if document.name not in listed:
+                errors.append(f"references/{document.name}: not listed in SKILL.md section 5")
+            found = second_level_headings(document.read_text(encoding="utf-8-sig"))
+            if found != expected:
+                errors.append(f"references/{document.name}: sections differ from the standard ten: {found}")
+    recon = references / "phase-recon.md"
+    if recon.is_file():
+        table = re.search(r"^\| Product type \|.*?(?=^\s*$)", recon.read_text(encoding="utf-8-sig"), re.M | re.S)
+        for row in (table.group(0).splitlines()[2:] if table else []):
+            cells = [cell.strip() for cell in row.strip().strip("|").split("|")]
+            for name in re.sub(r"\([^)]*\)", "", cells[1] if len(cells) > 1 else "").split(","):
+                if name.strip() and not (references / f"domain-{name.strip()}.md").is_file():
+                    errors.append(f"references/phase-recon.md: product row '{cells[0]}' names unknown domain '{name.strip()}'")
+    return errors
 
 
 def validate(root):
@@ -113,6 +158,7 @@ def validate(root):
             elif parts.fragment and target.suffix.lower() == ".md":
                 if unquote(parts.fragment) not in anchors(target.read_text(encoding="utf-8-sig")):
                     errors.append(f"{label}: missing heading anchor")
+    errors.extend(reference_errors(root, text))
     return errors
 
 
@@ -124,5 +170,5 @@ if __name__ == "__main__":
     for problem in problems:
         print(problem, file=sys.stderr)
     if not problems:
-        print("Skill metadata and local Markdown links: passed")
+        print("Skill metadata, local Markdown links and reference structure: passed")
     sys.exit(1 if problems else 0)

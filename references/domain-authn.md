@@ -30,7 +30,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Authentication model". Keep it short; hunters copy it.
+Add these to `domain-notes.md` under a heading "Authentication model". Keep it short; hunters copy it.
 
 1. **Principal types.** Users, admins, services, devices, peers, anonymous. For each: credential type and storage.
 2. **Entry points.** Every place that creates an authenticated context: login, token endpoint, SSO callback, API-key header, client certificate, WebSocket upgrade, CLI flag, pre-shared secret, signed message.

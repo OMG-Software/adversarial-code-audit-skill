@@ -33,7 +33,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Message flow map". Keep it short; hunters copy it.
+Add these to `domain-notes.md` under a heading "Message flow map". Keep it short; hunters copy it.
 
 1. **Channel table.** One row for each channel (queue, topic, webhook path, RPC method, stream). Columns: producers and how each authenticates | consumers | envelope fields | payload fields | privileged effect of the consumer | signature or MAC scope | replay defence | ordering assumption | delivery guarantee claimed | broker access rules | dead-letter or retry store.
 2. **Identity carriers.** For each channel, where the originating principal comes from: connection identity, token, signed envelope, payload field, header.

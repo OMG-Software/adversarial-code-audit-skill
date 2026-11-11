@@ -29,7 +29,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add a heading "Outbound requests" to `threat-model.md`.
+Add a heading "Outbound requests" to `domain-notes.md`.
 
 | Feature | Client and library (version) | Destination source (config / user / third party / stored) | Allow-list or block-list? | Redirects followed? | Resolution and connect (one step or two) | TLS settings | Proxy source | Credentials sent | Response returned to caller? | Limits (time, size) |
 |---|---|---|---|---|---|---|---|---|---|---|

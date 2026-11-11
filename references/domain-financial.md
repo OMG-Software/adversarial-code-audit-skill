@@ -32,7 +32,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Value flows". Keep it short.
+Add these to `domain-notes.md` under a heading "Value flows". Keep it short.
 
 1. **Value inventory.** Every kind of value (currency, points, credits, tokens, positions), its unit, scale and numeric type in code and in storage.
 2. **Flow map.** Each path where value is created, moved, reserved, spent, refunded, expired or destroyed, with the code that does it.

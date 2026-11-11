@@ -29,7 +29,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add a heading "Interpreter sinks" to `threat-model.md`.
+Add a heading "Interpreter sinks" to `domain-notes.md`.
 
 | Sink kind | Location (file:line) | API or builder | Data parts (values / names / structure) | Source of each part | Safe API available and used? |
 |---|---|---|---|---|---|

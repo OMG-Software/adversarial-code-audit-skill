@@ -10,17 +10,22 @@ Repository paths are relative to the target root. Never paste secret values.
 ## Header
 
 - fingerprint: <domain>.<component>.<root-cause>
-- status: proposed | confirmed | needs-validation | rejected
+- status: proposed | confirmed | needs-validation | rejected | fixed
 - evidence-level: E1 | E2 | E3
 - domain: <primary domain file name, for example authz>
+- root-cause-at: <path/to/file.ext>#<function or scope where the control fails, or where the missing control belongs>
 - cwe: <CWE-ID or "none">
 - coverage-units: <IDs from coverage.md, or the scoped threat model in Focused mode>
 - found-by: <agent or pass ID>
 - verified-by: <agent or pass ID, or "none">
 - source-ref: <commit hash and dirty-file hashes or snapshot identity from plan.md>
+- first-seen: <this run, or the earlier run that first reported this root cause, for example run-2>
 
 Fingerprint rules: lowercase letters, digits, hyphens and dots only. Derive it from the root cause and the component.
 Do not include line numbers, dates, agent IDs, severity or status. Use the same fingerprint for the same root cause in every run.
+
+`root-cause-at` is the key for finding duplicates. Write it without a line number. Two finding files with the same value
+describe one root cause, unless their failing controls differ: merge them, and keep the older fingerprint.
 
 ## Summary
 
@@ -51,9 +56,9 @@ Each step: kind (entry | step | sink), file:line, function or scope, what happen
 
 ## Conditions
 
-List every precondition. Mark each as source-visible or external.
+List every precondition. Mark each as source-visible, external, or owner-attested (the user stated it in the conversation; quote the words).
 
-- <condition> – source-visible | external
+- <condition> – source-visible | external | owner-attested
 
 ## Impact
 
@@ -74,7 +79,7 @@ Required when status is `confirmed` and evidence-level is E1 or E2. Otherwise wr
 The report prints this section unchanged, so write it for the code owner.
 
 - deterministic steps: <for each path step, why the source alone fixes the behaviour: no branch on runtime data the attacker cannot control, no reliance on timing, memory layout, compiler output or code outside the repository>
-- runtime dependencies checked: <framework, library or platform behaviour the path relies on, and where you confirmed it (vendored source, pinned version docs, type signatures)>
+- runtime dependencies checked: <framework, library or platform behaviour the path relies on, and where you confirmed it: source of the pinned version (vendored or in a package cache), its official documentation, type signatures, or a statement in this skill's reference files that covers that version. Your own memory is not a source>
 - what reproduction would add: <for example "confirms the deterministic wrong-tenant response in a local test"; an unresolved deployment condition belongs in Blocker and prevents this waiver>
 - recommended confirmation: <the smallest test the owner can run to see the effect>
 
@@ -106,6 +111,13 @@ Only for status `needs-validation`. Otherwise write "none".
 Only for status `rejected`. Otherwise write "none".
 
 - reason: <the control, condition or fact that disproves the claim, with file:line>
+
+## Resolution
+
+Only for status `fixed` (a finding carried from an earlier run). Otherwise write "none".
+
+- fixed-by: <the commit, or the file:line, that now enforces the control>
+- checked: <what you re-read or re-ran to see that the earlier path no longer works>
 
 ## Fix
 

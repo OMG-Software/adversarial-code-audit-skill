@@ -27,7 +27,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Authorization model". Keep it short; hunters copy it.
+Add these to `domain-notes.md` under a heading "Authorization model". Keep it short; hunters copy it.
 
 1. **Decision points.** List every place an authorization decision is made: middleware, decorators, base classes, policy-engine calls, inline `if` checks, database row filters. State central or scattered.
 2. **Subject source.** For each entry surface, where does the acting principal come from? (session, token claims, mTLS identity, signed message sender, request field). Any request-field source is a lead.

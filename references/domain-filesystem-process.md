@@ -27,7 +27,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add a heading "Privilege and file map" to `threat-model.md`.
+Add a heading "Privilege and file map" to `domain-notes.md`.
 
 | Process or component | Runs as (user, privileges) | Starts from (installer, service, setuid, user) | Files and directories it writes (path, mode or ACL, who else can write the directory) | Files and directories it reads that others can write | Child processes it starts | Environment variables it reads |
 |---|---|---|---|---|---|---|

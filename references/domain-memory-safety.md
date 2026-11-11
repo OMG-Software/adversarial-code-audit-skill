@@ -29,7 +29,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Native surface". Keep it short.
+Add these to `domain-notes.md` under a heading "Native surface". Keep it short.
 
 1. **Native inventory.** Files and languages with unsafe code, with the author (own or vendored) and the count of `unsafe` blocks or raw-pointer functions. Note which modules are safe code that calls into unsafe code.
 2. **Untrusted entries.** Table: entry (network protocol, file format, IPC message, plugin interface) | parser function | who controls the bytes | length caps before the parser.

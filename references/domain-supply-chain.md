@@ -30,7 +30,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under "Supply chain".
+Add these to `domain-notes.md` under "Supply chain".
 
 1. **Dependency sources.** Table: ecosystem | manifest and lockfile | registries and mirrors (with config file:line) | pinning (range, exact, hash) | install command in CI and in docs | scripts allowed at install.
 2. **Vendored code.** Directories, submodules and pasted snippets with origin, version and local patches.

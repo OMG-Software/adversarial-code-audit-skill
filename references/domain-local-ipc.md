@@ -30,7 +30,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under "Local boundaries".
+Add these to `domain-notes.md` under "Local boundaries".
 
 1. **Local principals.** Who else runs on the device: other OS users, other apps (trusted and untrusted), a browser, a remote desktop session, a container on the same host, malware at user level. State which the product must resist.
 2. **IPC surface table.** Mechanism | name or address | created by whom | permissions or DACL or signing requirement | peer check (file:line) | operations offered.

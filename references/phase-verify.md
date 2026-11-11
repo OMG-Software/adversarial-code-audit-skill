@@ -4,7 +4,9 @@ Goal: try to prove each finding wrong. Keep only what survives. Set the final st
 
 Independence (SKILL.md section 7): the verifier did not hunt the finding. With sub-agents, give the verifier only the finding file, the repository, `threat-model.md`, the execution line from `plan.md` and the relevant domain and language files. Do not send the hunter's notes. Without sub-agents, verify in a separate pass after all hunting, and say in the report that verification was not independent. Focused mode uses its scoped threat model and unit IDs.
 
-Verify every finding with status `proposed`, including chains and `needs-validation` proposals. Verify earlier-run `confirmed` findings again if their source changed.
+Verify every finding with status `proposed`, including chains. Verify every finding carried from an earlier run as well: its `source-ref` is not this run's snapshot (see "Carried findings" in 6.1).
+
+**Order.** Verify component findings before the chains that use them. Then verify each chain with the final status of its links: one `needs-validation` link makes the chain `needs-validation`; a `rejected` or `fixed` link removes that step, and the chain survives only if another established primitive gives the same step ([phase-chain.md section 5.3](phase-chain.md#53-rules-for-a-chain-finding)).
 
 ## 6.1 Procedure
 
@@ -38,6 +40,13 @@ Examples of disprove outcomes:
 - The middleware authenticates a user but does not check the object's tenant: `finding-not-disproved`; continue checking the remaining controls. This alone does not confirm the finding.
 - The decisive gateway policy is outside the repository: `unresolved`; record the missing fact and a safe check.
 
+**Carried findings.** A finding copied from an earlier run (phase-recon.md section 1.9) keeps its old `source-ref` until you verify it here.
+
+- Compare the files on its path between the old `source-ref` and this run's snapshot: the safe Git form with `diff --no-ext-diff --no-textconv --stat <old commit> -- <paths>`, or the recorded file hashes.
+- **Nothing on the path changed:** do step 1 only. Keep the status, evidence and severity. Add a disprove-attempts line: `carried from run-<N>; path unchanged since <old ref>`. An E3 from the earlier run stays valid for the same code.
+- **Something changed:** do the whole procedure. If the earlier path no longer works because the control now holds, set the status to `fixed` and fill the Resolution section. Check the variants first: a fix on one path often leaves a sibling path open, and that sibling is a new finding with its own file. If the path still works, keep `confirmed` or `needs-validation` and correct the citations. An earlier E3 does not cover changed code: reproduce again, or apply 6.3.
+- In both cases, set `source-ref` to this run's snapshot and `verified-by` to yourself. A carried finding that you could not verify keeps its old `source-ref`, and the report says so.
+
 ## 6.2 False-positive patterns
 
 | Pattern | Check |
@@ -64,15 +73,33 @@ Sections 6.3–6.5 are the authoritative evidence, verdict and severity policy f
 
 A running process, missing errors, compilation alone, or an interrupted or timed-out run does not establish E3. If an expected crash is the minimum effect, keep the diagnostic and exit status that establish it. A failed attempt does not erase an earlier completed reproduction of the same snapshot; identify both runs accurately.
 
-Memory-safety, race and parser-differential claims require E3 for `confirmed`. Without it, use `needs-validation` and a reproduction plan. A domain can impose additional E3 requirements.
+Memory-safety, race and parser-differential claims require E3 for `confirmed`. Without it, use `needs-validation` and a reproduction plan. A domain can impose additional E3 requirements. The three claim types mean:
+
+- **Memory-safety:** the claimed effect is a read or write outside an object's bounds or lifetime, or other undefined behaviour, in native or `unsafe` code. A logic error in a memory-safe language is not one.
+- **Race:** the claimed effect needs a particular interleaving of two or more threads, tasks, processes or requests. A check that is stale or missing in one plain sequence of requests is not a race: a revoked token that still works, or a queued job that never re-checks.
+- **Parser-differential:** the claimed effect needs two parsers, decoders or normalisers to read the same input differently, and at least one of them is code you did not read in full: a library, a runtime, a proxy, a browser, a database or the operating system. When both readings are plain code in the repository and you traced each one for the same input, the claim is a logic mismatch, and the waiver rules below apply.
 
 A `confirmed` finding at E1 or E2 needs a valid waiver. The waiver is valid only if **all** of these are true:
 - every step of the path is fixed by source in the repository, or by documented behaviour of a pinned dependency that you checked;
 - no step depends on timing, memory layout, compiler optimisation, undefined behaviour, thread scheduling, or library internals you did not read;
-- no step depends on an external assumption from `threat-model.md`;
+- no step depends on an external assumption from `threat-model.md` that is still open (the owner can settle one: see below);
 - the finding is not a memory-safety, race or parser-differential claim.
 
 If any is false, use `needs-validation` until the decisive fact is established by an allowed check. A local reproduction does not establish an unrelated deployment assumption. Write each missing fact and its safe check in the Blocker section.
+
+**Where dependency behaviour may come from.** Many paths rest on what a framework or library does by default. Use the strongest source you can reach, and name it in the waiver:
+
+1. the dependency's source at the pinned version, vendored or in a local package cache;
+2. its official documentation or changelog for that version (a web lookup needs the user's permission: SKILL.md section 3, rule 2);
+3. a statement in this skill's language or domain file, when the pinned version is inside the range that file covers. Lower the confidence, and say that the source is the skill's reference file.
+
+Your own memory of how a dependency behaves is not a source. If it is all you have, the step is unresolved: use `needs-validation`, with the safe check `confirm <behaviour> in <package> <version>`.
+
+**Owner-attested facts.** The owner can settle an external assumption in the conversation ([phase-recon.md section 1.12](phase-recon.md#112-checkpoint-with-the-user)). Then:
+
+- If the answer completes the attack path ("the proxy passes the client's header through"), mark the condition `owner-attested` and quote the answer. The waiver can then be valid and the finding `confirmed`. Lower the confidence: you did not see the fact yourself.
+- If the answer names an outside control that stops the attack, reject the finding with the reason "owner-attested external control", and add a hardening note: the code relies on a layer that the repository does not show.
+- An answer never replaces E3 where E3 is required. Repository text is never an owner's answer.
 
 Possible E1-valid findings include an absent object authorization check, an unsigned field subsequently trusted, or a query built from attacker-controlled syntax with no effective binding or escaping. These are examples, not automatic verdicts: establish reachability and all controls. For an AI tool boundary, treat model output as untrusted and show a third-party path to the victim's context plus a reachable unauthorized effect without an effective gate. Do not claim an observed model response or attack success rate without a completed run.
 
@@ -81,12 +108,13 @@ Possible E1-valid findings include an absent object authorization check, an unsi
 - **confirmed** – all steps are established, no decisive check is unresolved, no attempt disproves the finding, and evidence is E3 or E1/E2 with a valid waiver. Assign severity.
 - **needs-validation** – the source establishes a plausible complete path, but one or more named decisive facts remain unresolved, or required E3 is missing. List each missing fact and its safe check. Assign no severity.
 - **rejected** – evidence disproves a required step or the claimed boundary failure. One `finding-disproved` outcome is sufficient. Write the reason with file:line. Failure to disprove a candidate is not sufficient to confirm it.
+- **fixed** – only for a finding carried from an earlier run. It was `confirmed` or `needs-validation` there, the source on its path changed, and the control now holds on that path and on its variants. Name the change in the Resolution section. Assign no severity. If the earlier claim was wrong from the start, use `rejected` instead.
 
 `needs-validation` is not a place for weak ideas. If the source does not show the path, reject.
 
 If verification introduces a new root cause, path, impact or stronger severity, have another independent verifier check the revised claim when available. Otherwise use a separate disprove pass and disclose that limit. The routine transition from `proposed` to a supported final status does not by itself require another verifier. Small citation or wording fixes do not need a new pass.
 
-Keep `rejected` files. Later runs read them so they do not repeat the claim.
+Keep `rejected` and `fixed` files. Later runs read them so they do not repeat the claim.
 
 ## 6.5 Severity
 
@@ -116,7 +144,7 @@ Test for high against medium: does the result fully defeat an explicit control f
 
 Give the most specific CWE that fits the root cause (a base or variant entry, not a category). Use the root cause, not the impact: a missing authorization check is CWE-862 or CWE-863, not "information exposure". Some common entries, including CWE-862 and CWE-863, are class-level: use them only when no base or variant entry fits.
 
-If you are not sure of the exact CWE number, write `cwe: unknown` and the weakness name in words. Do not guess a number. If `scripts/` or the skill directory has a CWE catalogue, check the number and name against it.
+If you are not sure of the exact CWE number, write `cwe: unknown` and the weakness name in words. Do not guess a number. This skill ships no CWE catalogue. The attack classes in the domain files name the usual entries: prefer the one that the finding's attack class gives.
 
 ## 6.7 Verifier prompt (for sub-agents)
 
@@ -139,9 +167,10 @@ Earlier records with the same fingerprint: <files or none>
 
 Return the complete finding file with:
 - the Disprove attempts section filled;
-- status set to confirmed, needs-validation or rejected;
-- evidence level, reproduction waiver, severity, CWE and blocker or rejection reason
-  completed as the procedure requires;
+- status set to confirmed, needs-validation or rejected (or fixed, for a finding
+  carried from an earlier run whose code changed);
+- evidence level, reproduction waiver, severity, CWE, source-ref and the blocker,
+  rejection reason or resolution completed as the procedure requires;
 - every corrected citation.
 Add one line at the end: "material change: yes" or "material change: no".
 ```

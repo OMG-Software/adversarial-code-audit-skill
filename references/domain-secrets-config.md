@@ -32,7 +32,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Configuration and secrets model". Keep it short.
+Add these to `domain-notes.md` under a heading "Configuration and secrets model". Keep it short.
 
 1. **Config sources.** Table: source (built-in defaults, file, environment, command line, remote config, database, flag service, per-tenant settings) | who can write it | when read | what it overrides.
 2. **Security settings.** Table: key | meaning | default | production value | behaviour when missing or invalid | file:line.

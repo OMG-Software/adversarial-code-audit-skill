@@ -28,7 +28,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Unusual code". Keep it short.
+Add these to `domain-notes.md` under a heading "Unusual code". Keep it short.
 
 1. **Entry inventory against use.** Every route, command, message type, RPC method, handler and CLI option, against the callers in the shipped clients and documentation. List the ones that no known client uses.
 2. **Version and compatibility layers.** Old API versions, old file and wire formats, migration code, shims, fallbacks for old clients, and the setting that enables each.

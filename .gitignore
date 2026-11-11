@@ -1,0 +1,7 @@
+# Local tool state
+.serena/
+__pycache__/
+*.pyc
+
+# Audit output written beside or inside a checkout
+security-audit/

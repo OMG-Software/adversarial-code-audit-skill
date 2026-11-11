@@ -32,7 +32,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Data copy map". Keep it short; hunters copy it.
+Add these to `domain-notes.md` under a heading "Data copy map". Keep it short; hunters copy it.
 
 1. **Copy table.** One row for each data class. Columns: primary store | each derived copy (cache, index, replica, view, export, backup, analytics, queue payload, blob, device cache) | key or partition | access check at read | deletion path | retention | restore path.
 2. **Lifecycle events.** For each event (create, share, revoke, delete, restore, export, migrate, expire), list which copies change, and how: in the same transaction, by event, by job, or never.

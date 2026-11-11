@@ -31,7 +31,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Data and log inventory". Keep it short; hunters copy it.
+Add these to `domain-notes.md` under a heading "Data and log inventory". Keep it short; hunters copy it.
 
 1. **Sink table.** One row for each sink: file, standard output, system log, log shipper, metrics, traces, error tracker, analytics service, crash uploader, debug bundle. Columns: writers | fields | who can read | retention | leaves the trust boundary? | recipient.
 2. **Data classes.** Secrets, personal data, user content, financial data, device and network identifiers. Mark the source of each in the code.

@@ -29,7 +29,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Business rules". Keep it short.
+Add these to `domain-notes.md` under a heading "Business rules". Keep it short.
 
 1. **State machines.** For each stateful entity (order, account, ticket, job, device, session, document, subscription): states, allowed transitions, who triggers each, and where the code stores the state.
 2. **One-time effects.** Every coupon, token, invite, trial, reward, vote, claim and unlock, and where the code records that it was used.

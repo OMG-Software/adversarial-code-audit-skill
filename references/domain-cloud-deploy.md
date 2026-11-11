@@ -30,7 +30,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under "Deployment model".
+Add these to `domain-notes.md` under "Deployment model".
 
 1. **Identity table.** Identity | who can assume it (trust policy file:line) | permissions (file:line) | attached to which workload.
 2. **Exposure table.** Interface | port | bind address | listener type (public, internal, cluster-only) | auth in front | file:line. Include control-plane and datastore ports.

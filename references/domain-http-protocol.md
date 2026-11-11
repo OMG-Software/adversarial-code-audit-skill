@@ -29,7 +29,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "HTTP path".
+Add these to `domain-notes.md` under a heading "HTTP path".
 
 1. **Request path diagram.** The hops from client to application: CDN, load balancer, proxy, web server, application. Name the software and version of each hop that the repository shows. Mark the other hops as external.
 2. **Configuration inventory.** Every file that configures a hop: nginx `*.conf`, Apache vhosts and `.htaccess`, CDN rule exports, VCL, ingress annotations, Dockerfiles that copy these files. Note the environment each file serves.

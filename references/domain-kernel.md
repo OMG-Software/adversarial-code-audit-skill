@@ -28,7 +28,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Kernel interface map". Keep it short.
+Add these to `domain-notes.md` under a heading "Kernel interface map". Keep it short.
 
 1. **Entry points.** Table: type (syscall, ioctl, netlink, sysfs/procfs/debug file, device node, file-system operation, hypercall, register handler, virtual queue, interrupt) | registration site | who can reach it (node mode, capability, namespace, sandbox filter) | arguments | copy routines.
 2. **Reach.** Device-node permissions and rules that the repository ships; module auto-load; whether unprivileged user namespaces reach the interface; whether the hardware exists on a default system.

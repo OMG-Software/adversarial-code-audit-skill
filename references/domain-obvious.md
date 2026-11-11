@@ -31,7 +31,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Literal surface". Keep each item short.
+Add these to `domain-notes.md` under a heading "Literal surface". Keep each item short.
 
 1. **Listeners.** Every port, socket and default bind address, and the setting that changes it.
 2. **Build profiles.** Every build mode and environment switch (debug, dev, test, production). State which one ships.

@@ -6,7 +6,7 @@ Normally start this phase after every finding is verified. If a budget or contex
 
 Outputs:
 - `REPORT.md` – always.
-- `findings.json` and `findings.sarif` – if the user asks, or if a script in `scripts/` can produce them.
+- `findings.json` and `findings.sarif` – if the user asks. With Python, `python <skill-directory>/scripts/audit_run.py export <run-directory>` writes both from the finding files. That is this skill's own script. Never use a script from the target.
 
 Focused mode writes a report only when requested and uses the relevant sections below. Omit full-audit ledgers and counts that were not collected. Do not invent coverage numbers.
 
@@ -17,6 +17,7 @@ Focused mode writes a report only when requested and uses the relevant sections 
 - Give inputs as test inputs for a local test, not as attacks against a deployment.
 - No secret values. No weaponised exploits. No steps beyond the minimum effect.
 - State uncertainty where it exists. Do not round `needs-validation` up to a vulnerability or down to nothing.
+- The report describes vulnerabilities. Tell the user where it is stored, and copy it nowhere else.
 
 ## 7.2 `REPORT.md` layout
 
@@ -25,11 +26,12 @@ Focused mode writes a report only when requested and uses the relevant sections 
 - Target, commit, dirty state, and the date of the run.
 - Mode, profile, scope, capability tier, budget used against budget planned.
 - Domain and language files used, and the excluded ones with reasons.
-- Tools run, with versions. Each tool that fits the target but did not run, with its one reason from [phase-leads.md section 2.1](phase-leads.md#21-static-tools-t1) (`absent`, `absent-declined`, `T2-skipped`, `network-declined`, `failed`), and what that means for coverage. If no advisory scanner ran, include the sentence "Dependency advisories were not checked against a vulnerability database."
+- Tools run, with versions, and whether each used its own configuration or the target's. Each tool that fits the target but did not run, with its one reason from [phase-leads.md section 2.1](phase-leads.md#21-static-tools-t1) (`absent`, `absent-declined`, `T2-skipped`, `network-declined`, `failed`), and what that means for coverage. If no advisory scanner ran, include the sentence "Dependency advisories were not checked against a vulnerability database."
 - Execution: the isolation level the user chose (I0–I3), missing controls, approval mode, and how many reproductions ran at each level, completed or not. If any ran at I1 or I2, say so in one plain sentence. Never call host guards a sandbox.
 - Verification: independent sub-agents, or a separate pass by the same agent.
 - Scratch cleanup: what was removed and what was kept (execution.md section 8).
-- Earlier runs used as input.
+- Earlier runs used as input, and the number of findings carried forward from them.
+- Owner-attested facts: each question, the answer in the user's words, and the findings that rest on it.
 - One sentence if the run is partial: quick profile, scoped, budget-limited, context-limited or with deferred units.
 
 ### 2. How to read the evidence
@@ -52,18 +54,20 @@ Counts: confirmed findings by evidence level.
 
 ### 3. Summary
 
+- Urgent discoveries that were reported during the run (SKILL.md section 3, rule 9), first.
 - Two to four sentences on the security posture: where the code is strong, where it is weak, the most important finding.
 - Table of confirmed findings, sorted by overall severity, then confidence:
 
 ```markdown
-| ID | Severity | Title | Boundary | Evidence | Confidence |
-|----|----------|-------|----------|----------|------------|
+| ID | Severity | Title | Boundary | Evidence | Confidence | First seen |
+|----|----------|-------|----------|----------|------------|------------|
 ```
 
 ### 4. Confirmed findings
 
 For each, in table order:
 - Title, fingerprint, CWE, overall severity, likelihood and impact with reasons.
+- For a finding carried from an earlier run: the run that first reported it. If its `source-ref` is older than this run, add "not re-verified in this run".
 - Summary: who can do what to whom.
 - Attacker and conditions.
 - Path, as an ordered list of file:line steps.
@@ -109,7 +113,13 @@ The important controls that hunters attacked and found sound, with the checks do
 
 Count only, plus the fingerprints, unless a rejection explains a coverage decision.
 
+### 11. Fixed since earlier runs
+
+Findings carried from an earlier run that phase 6 found `fixed`: fingerprint, title, the run that first reported it, and what fixed it. Leave this section out when no earlier run was used.
+
 ## 7.3 Consistency check
+
+With Python, run `python <skill-directory>/scripts/audit_run.py check <run-directory>` first. It tests the finding files and the ledgers against this skill's rules, checks that every finding appears in the report, and prints the counts for item 3. Correct what it reports in the files it names. It cannot judge items 2, 5 and 6: do those yourself.
 
 Before you finish, check:
 1. Every finding file has exactly one primary detail or disposition entry matching its status, including an unverified entry for `proposed`. Summary and chain cross-references do not count as duplicate entries.
@@ -133,4 +143,6 @@ Write the result of the check at the end of `REPORT.md` as one line: "Consistenc
 - `locations` is the sink; `codeFlows` holds the full path;
 - `properties` hold evidence level, confidence and severity fields.
 
-Do not include `rejected` findings in SARIF.
+Do not include `rejected`, `fixed` or unverified (`proposed`) findings in SARIF.
+
+`audit_run.py export` writes both files in this format.

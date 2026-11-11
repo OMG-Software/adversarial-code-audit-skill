@@ -31,7 +31,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add these to `threat-model.md` under a heading "Concurrency model". Keep it short.
+Add these to `domain-notes.md` under a heading "Concurrency model". Keep it short.
 
 1. **Runtime model.** Threads, event loop, processes, tasks, actors. Where a context switch can happen (each `await`, blocking call and callback). How many instances run. An in-process lock does not protect two instances.
 2. **Shared state table.** Columns: state | where | writers | readers | guard | security meaning. Include globals, singletons, caches, pools and counters.

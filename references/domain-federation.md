@@ -30,7 +30,7 @@ Fill the placeholders from `threat-model.md`.
 
 ## Recon additions
 
-Add a heading "Federation model" to `threat-model.md`:
+Add a heading "Federation model" to `domain-notes.md`:
 
 1. **Peer protocol surfaces.** Every inbound server-to-server endpoint, message type and transaction type, with file:line. Mark which require peer authentication.
 2. **Peer identity.** How the server learns who a peer is: TLS client certificate, signed requests, dialback, DNS, well-known files, discovery records, shared secrets. Where the claimed name is compared with the verified name.
